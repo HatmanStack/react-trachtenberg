@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Trachtenberg Multiplication",
+    "slug": "trachtenberg-multiplication",
+    "version": "1.0.0",
+    "scheme": "trachtenberg",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#9fa8da"
+    },
+    "platforms": ["web", "ios", "android"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.trachtenberg.multiplication"
+    },
+    "android": {
+      "package": "com.trachtenberg.multiplication",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#9fa8da"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "static"
+    }
+  }
+}
