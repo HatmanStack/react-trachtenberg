@@ -9,7 +9,7 @@
 
 A cross-platform mobile and web application to teach the [Trachtenberg method](https://en.wikipedia.org/wiki/Trachtenberg_system) of multiplication, a system of rapid mental calculation. The system was created by Jakow Trachtenberg, a Russian Jew, while in a Nazi concentration camp.
 
-![Try It](https://trachtenberg.hatstack.fun)
+[Try It](https://trachtenberg.hatstack.fun)
 
 ---
 
