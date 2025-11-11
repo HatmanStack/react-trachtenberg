@@ -44,8 +44,7 @@ export default function LearnScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={[styles.content, isLargeScreen && styles.contentLarge]}>
-        <View style={isLargeScreen ? styles.innerContainer : undefined}>
+      <View style={isLargeScreen ? styles.innerContainer : undefined}>
           {/* Explanation Section */}
             <Surface style={styles.explanationSurface}>
           <Text variant="bodyLarge" style={styles.explanationText}>
@@ -85,8 +84,7 @@ export default function LearnScreen() {
           <Text variant="bodySmall" style={styles.pageIndicator}>
             Step {currentPage + 1} of 18
           </Text>
-        </View>
-      </ScrollView>
+      </View>
 
       {/* Navigation Buttons */}
       <View style={[styles.buttonContainer, isLargeScreen && styles.buttonContainerLarge]}>
@@ -115,20 +113,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
     padding: SPACING.md,
     paddingBottom: 100,
-  },
-  contentLarge: {
-    alignItems: 'center',
-    paddingHorizontal: SPACING.xl,
+    alignItems: isLargeScreen ? 'center' : 'stretch',
   },
   innerContainer: {
-    maxWidth: 800,
+    maxWidth: 600,
     width: '100%',
   },
   explanationSurface: {

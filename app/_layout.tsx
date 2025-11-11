@@ -17,7 +17,7 @@ function TabLayout() {
           height: Platform.OS === 'web' ? 60 : undefined,
         },
         tabBarLabelStyle: {
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: '600',
           textTransform: 'none',
         },
@@ -27,7 +27,7 @@ function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Learn',
+          title: 'Trachtenberg',
           tabBarAccessibilityLabel: 'Navigate to Tutorial',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="school" size={24} color={color} />
