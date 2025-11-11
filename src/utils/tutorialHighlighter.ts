@@ -53,7 +53,7 @@ export function getTutorialHighlightIndices(answerText: string): number[] {
     }
 
     return indices;
-  } catch (error) {
+  } catch {
     // Return empty array on any parsing error
     return [];
   }

@@ -20,6 +20,7 @@ export const AnswerButton: React.FC<AnswerButtonProps> = React.memo(
         disabled={disabled}
         style={styles.button}
         labelStyle={styles.label}
+        contentStyle={styles.content}
       >
         {value}
       </Button>
@@ -34,9 +35,17 @@ const styles = StyleSheet.create({
     margin: 8,
     flex: 1,
     minHeight: 80,
+    maxWidth: 150,
+    minWidth: 100,
+  },
+  content: {
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   label: {
     fontSize: 32,
     fontWeight: 'bold',
+    lineHeight: 32,
   },
 });

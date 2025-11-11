@@ -13,7 +13,11 @@
       "resizeMode": "contain",
       "backgroundColor": "#9fa8da"
     },
-    "platforms": ["web", "ios", "android"],
+    "platforms": [
+      "web",
+      "ios",
+      "android"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.trachtenberg.multiplication"
@@ -28,9 +32,12 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png",
+      "favicon": "./assets/favicon.ico",
       "bundler": "metro",
       "output": "static"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }

@@ -1,15 +1,18 @@
-import React, { useEffect, useRef, useCallback } from 'react';
-import { StyleSheet, View, ScrollView, Animated } from 'react-native';
-import { Surface, Text, Button, IconButton } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import React, { useCallback } from 'react';
+import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
+import { Surface, Text, Button } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 import { useTutorialNavigation } from '../hooks/useTutorialNavigation';
 import { tutorialSteps, TUTORIAL_EQUATION } from '../data/tutorialContent';
 import { getTutorialHighlightIndices } from '../utils/tutorialHighlighter';
 import { HighlightedText } from '../components/HighlightedText';
 import { COLORS, SPACING } from '../theme/constants';
 
+const { width } = Dimensions.get('window');
+const isLargeScreen = width > 768;
+
 export default function LearnScreen() {
-  const navigation = useNavigation();
+  const router = useRouter();
   const {
     currentPage,
     goNext,
@@ -19,60 +22,32 @@ export default function LearnScreen() {
     canGoPrevious,
   } = useTutorialNavigation();
 
+  console.log('LearnScreen render, currentPage:', currentPage);
+
   const currentStep = tutorialSteps[currentPage];
   const highlightIndices = getTutorialHighlightIndices(currentStep.answer);
 
-  // Animated value for page transitions
-  const contentOpacity = useRef(new Animated.Value(1)).current;
-
-  // Set up navigation header with Settings button
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <IconButton
-          icon="cog"
-          size={24}
-          onPress={() => navigation.navigate('Settings' as never)}
-        />
-      ),
-    });
-  }, [navigation]);
-
-  // Animation for page transitions
-  const changePage = useCallback((direction: 'next' | 'previous') => {
-    // Fade out current content
-    Animated.timing(contentOpacity, {
-      toValue: 0,
-      duration: 150,
-      useNativeDriver: true,
-    }).start(() => {
-      // Change page
-      direction === 'next' ? goNext() : goPrevious();
-
-      // Fade in new content
-      Animated.timing(contentOpacity, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }).start();
-    });
-  }, [contentOpacity, goNext, goPrevious]);
-
   const handleNext = useCallback(() => {
+    console.log(`handleNext called, isLastPage: ${isLastPage}, currentPage: ${currentPage}`);
     if (isLastPage) {
       // Navigate to Practice screen on last page (no animation)
-      navigation.navigate('Practice' as never);
+      router.push('/practice');
     } else {
-      changePage('next');
+      goNext();
     }
-  }, [isLastPage, navigation, changePage]);
+  }, [isLastPage, router, goNext, currentPage]);
+
+  const handlePrevious = useCallback(() => {
+    console.log(`handlePrevious called, currentPage: ${currentPage}`);
+    goPrevious();
+  }, [goPrevious, currentPage]);
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-        <Animated.View style={{ opacity: contentOpacity }}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={[styles.content, isLargeScreen && styles.contentLarge]}>
+        <View style={isLargeScreen ? styles.innerContainer : undefined}>
           {/* Explanation Section */}
-          <Surface style={styles.explanationSurface}>
+            <Surface style={styles.explanationSurface}>
           <Text variant="bodyLarge" style={styles.explanationText}>
             {currentStep.explanation}
           </Text>
@@ -110,14 +85,14 @@ export default function LearnScreen() {
           <Text variant="bodySmall" style={styles.pageIndicator}>
             Step {currentPage + 1} of 18
           </Text>
-        </Animated.View>
+        </View>
       </ScrollView>
 
       {/* Navigation Buttons */}
-      <View style={styles.buttonContainer}>
+      <View style={[styles.buttonContainer, isLargeScreen && styles.buttonContainerLarge]}>
         <Button
           mode="contained"
-          onPress={() => changePage('previous')}
+          onPress={handlePrevious}
           disabled={!canGoPrevious}
           style={styles.button}
         >
@@ -146,15 +121,28 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: SPACING.md,
+    paddingBottom: 100,
+  },
+  contentLarge: {
+    alignItems: 'center',
+    paddingHorizontal: SPACING.xl,
+  },
+  innerContainer: {
+    maxWidth: 800,
+    width: '100%',
   },
   explanationSurface: {
     padding: SPACING.lg,
     marginBottom: SPACING.md,
     elevation: 2,
     borderRadius: 8,
+    width: '100%',
+    justifyContent: 'center',
+    minHeight: 100,
   },
   explanationText: {
     lineHeight: 24,
+    textAlign: 'center',
   },
   equationSurface: {
     padding: SPACING.lg,
@@ -162,6 +150,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     borderRadius: 8,
     alignItems: 'center',
+    width: '100%',
   },
   equation: {
     fontSize: 32,
@@ -173,9 +162,13 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     elevation: 2,
     borderRadius: 8,
+    width: '100%',
+    justifyContent: 'center',
+    minHeight: 80,
   },
   answerText: {
     lineHeight: 22,
+    textAlign: 'center',
   },
   bottomArrowSurface: {
     padding: SPACING.lg,
@@ -183,6 +176,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     borderRadius: 8,
     alignItems: 'center',
+    width: '100%',
   },
   bottomArrow: {
     fontWeight: 'bold',
@@ -200,8 +194,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     elevation: 4,
   },
+  buttonContainerLarge: {
+    justifyContent: 'center',
+    paddingHorizontal: '20%',
+  },
   button: {
     flex: 1,
     marginHorizontal: SPACING.sm,
+    maxWidth: isLargeScreen ? 200 : undefined,
   },
 });

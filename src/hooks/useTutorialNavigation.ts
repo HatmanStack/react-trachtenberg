@@ -10,14 +10,20 @@ export const useTutorialNavigation = () => {
   const setTutorialPage = useAppStore((state) => state.setTutorialPage);
 
   const goNext = () => {
+    console.log('goNext called, current page:', tutorialPage);
     if (tutorialPage < TUTORIAL_STEP_COUNT - 1) {
-      setTutorialPage(tutorialPage + 1);
+      const newPage = tutorialPage + 1;
+      console.log('Setting tutorial page to:', newPage);
+      setTutorialPage(newPage);
     }
   };
 
   const goPrevious = () => {
+    console.log('goPrevious called, current page:', tutorialPage);
     if (tutorialPage > 0) {
-      setTutorialPage(tutorialPage - 1);
+      const newPage = tutorialPage - 1;
+      console.log('Setting tutorial page to:', newPage);
+      setTutorialPage(newPage);
     }
   };
 

@@ -16,7 +16,7 @@ import { LinkingOptions } from '@react-navigation/native';
  * - trachtenberg://settings
  */
 
-export const linking: LinkingOptions<any> = {
+export const linking: LinkingOptions<Record<string, unknown>> = {
   prefixes: ['trachtenberg://', 'https://trachtenberg.app'],
   config: {
     screens: {

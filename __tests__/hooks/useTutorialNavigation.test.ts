@@ -32,9 +32,11 @@ describe('useTutorialNavigation', () => {
   test('goPrevious decrements page', () => {
     const { result } = renderHook(() => useTutorialNavigation());
 
-    // Move to page 2
+    // Move to page 2 (separate act calls for each state update)
     act(() => {
       result.current.goNext();
+    });
+    act(() => {
       result.current.goNext();
     });
 
@@ -80,10 +82,14 @@ describe('useTutorialNavigation', () => {
   test('reset returns to page 0', () => {
     const { result } = renderHook(() => useTutorialNavigation());
 
-    // Move forward
+    // Move forward (separate act calls for each state update)
     act(() => {
       result.current.goNext();
+    });
+    act(() => {
       result.current.goNext();
+    });
+    act(() => {
       result.current.goNext();
     });
 

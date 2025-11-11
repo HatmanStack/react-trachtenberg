@@ -22,10 +22,18 @@ interface HintDisplayProps {
 
 export const HintDisplay: React.FC<HintDisplayProps> = React.memo(
   ({ question, result, visible, onPress }) => {
+    console.log('HintDisplay render - visible:', visible, 'question:', question, 'result:', result);
+
     if (!visible) return null;
 
     return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        onPress={() => {
+          console.log('HintDisplay clicked!');
+          onPress();
+        }}
+        activeOpacity={0.7}
+      >
         <Surface style={styles.container} elevation={1}>
           <Text variant="titleMedium" style={styles.question}>
             {question || 'Touch to see hint'}

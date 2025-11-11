@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persistMiddleware } from './middleware/persistMiddleware';
 import { generateProblem, formatEquation } from '../utils/problemGenerator';
 import { generateAnswerChoices, getDigitAtPosition } from '../utils/answerChoices';
 import { validateAnswer } from '../utils/answerValidator';
@@ -46,9 +45,7 @@ interface AppState {
   resetHints: () => void;          // Reset hint state for new digit
 }
 
-export const useAppStore = create<AppState>()(
-  persistMiddleware(
-    (set, get) => ({
+export const useAppStore = create<AppState>()((set, get) => ({
       // Initial state
       hintsEnabled: false,
       hintHelpShown: false,
@@ -74,11 +71,16 @@ export const useAppStore = create<AppState>()(
       // Actions
       setHintsEnabled: (enabled) => set({ hintsEnabled: enabled }),
       setHintHelpShown: (shown) => set({ hintHelpShown: shown }),
-      setTutorialPage: (page) => set({ tutorialPage: page }),
+      setTutorialPage: (page) => {
+        console.log('setTutorialPage called with:', page);
+        set({ tutorialPage: page });
+      },
 
       // Practice actions
       generateNewProblem: () => {
+        console.log('generateNewProblem called in store');
         const problem = generateProblem();
+        console.log('Generated problem:', problem);
         const equation = formatEquation(problem);
         const answer = problem.answer.toString();
 
@@ -89,6 +91,8 @@ export const useAppStore = create<AppState>()(
         // Initialize hint state for first digit (indexCount = 0)
         const { startMove, moveCount } = getMoveRange(0);
 
+        console.log('Setting state with equation:', equation);
+        console.log('Initial hint state - startMove:', startMove, 'moveCount:', moveCount);
         set({
           currentEquation: equation,
           currentAnswer: answer,
@@ -109,6 +113,9 @@ export const useAppStore = create<AppState>()(
 
       submitAnswer: (buttonIndex: number) => {
         const state = get();
+        console.log('submitAnswer called - buttonIndex:', buttonIndex, 'correctIndex:', state.correctAnswerIndex);
+        console.log('submitAnswer - current state: indexCount:', state.indexCount, 'answerProgress:', state.answerProgress);
+
         const result = validateAnswer(
           buttonIndex,
           state.correctAnswerIndex,
@@ -117,7 +124,10 @@ export const useAppStore = create<AppState>()(
           state.firstCharRemainder
         );
 
+        console.log('submitAnswer - validateAnswer result:', result);
+
         if (!result.isCorrect) {
+          console.log('submitAnswer - wrong answer, returning');
           return { isCorrect: false, isComplete: false };
         }
 
@@ -136,17 +146,23 @@ export const useAppStore = create<AppState>()(
         }
 
         // Generate new choices for next digit
+        console.log('submitAnswer - generating new choices for next digit at indexCount:', result.newIndexCount);
         const nextDigit = getDigitAtPosition(
           parseInt(state.currentAnswer, 10),
           result.newIndexCount
         );
+        console.log('submitAnswer - nextDigit:', nextDigit);
+
         const { choices, correctIndex } = generateAnswerChoices(nextDigit);
+        console.log('submitAnswer - new choices:', choices, 'correctIndex:', correctIndex);
 
         // Calculate carry digit for next position (Android lines 367-375)
         const carryDigit = Math.floor(state.remainderHint / 10);
+        console.log('submitAnswer - carry digit:', carryDigit);
 
         // Get hint state for next digit
         const { startMove, moveCount } = getMoveRange(result.newIndexCount);
+        console.log('submitAnswer - new hint range: startMove:', startMove, 'moveCount:', moveCount);
 
         // Update state for next digit
         set({
@@ -164,6 +180,7 @@ export const useAppStore = create<AppState>()(
           hintHighlightIndices: [],
         });
 
+        console.log('submitAnswer - state updated with new choices');
         return { isCorrect: true, isComplete: false };
       },
 
@@ -189,8 +206,11 @@ export const useAppStore = create<AppState>()(
       nextHint: () => {
         const state = get();
 
+        console.log('nextHint called - move:', state.move, 'moveCount:', state.moveCount, 'indexCount:', state.indexCount);
+
         // Check if we've reached moveCount
         if (state.move >= state.moveCount) {
+          console.log('nextHint: reached moveCount, returning');
           return; // No more hints for this digit
         }
 
@@ -198,17 +218,30 @@ export const useAppStore = create<AppState>()(
         const hintStep = calculateHintStep(
           state.currentEquation,
           state.move,
-          state.remainderHint
+          state.remainderHint,
+          state.indexCount
         );
+
+        console.log('nextHint: calculated hintStep', JSON.stringify(hintStep, null, 2));
+
+        const newHintResult = state.hintResult + hintStep.resultDisplay;
+        console.log('nextHint: updating hintQuestion to:', hintStep.question);
+        console.log('nextHint: updating hintResult to:', newHintResult);
 
         // Update state with hint information
         set({
           move: state.move + 1,
           remainderHint: hintStep.newRemainder,
           hintQuestion: hintStep.question,
-          hintResult: state.hintResult + hintStep.resultDisplay,
+          hintResult: newHintResult,
           hintHighlightIndices: hintStep.highlightIndices,
         });
+
+        console.log('nextHint: updated state, new move:', state.move + 1);
+
+        // Log the updated state to verify
+        const newState = get();
+        console.log('nextHint: verified new state - question:', newState.hintQuestion, 'result:', newState.hintResult);
       },
 
       resetHints: () => {
@@ -221,20 +254,4 @@ export const useAppStore = create<AppState>()(
           hintHighlightIndices: [],
         });
       },
-    }),
-    {
-      name: 'trachtenberg-app-storage',
-      partialize: (state) => ({
-        // Settings
-        hintsEnabled: state.hintsEnabled,
-        hintHelpShown: state.hintHelpShown,
-        // Practice progress (persist current problem)
-        currentEquation: state.currentEquation,
-        currentAnswer: state.currentAnswer,
-        answerProgress: state.answerProgress,
-        indexCount: state.indexCount,
-        firstCharRemainder: state.firstCharRemainder,
-      }),
-    }
-  )
-);
+    }));

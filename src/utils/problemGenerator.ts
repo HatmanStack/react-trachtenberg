@@ -42,11 +42,45 @@ export function generateProblem(): PracticeProblem {
 }
 
 /**
- * Formats a problem as an equation string
+ * Formats a problem as an equation string (without padding)
  * Uses × symbol to match tutorial
+ * Padding is handled dynamically in the UI based on hint state
  */
 export function formatEquation(problem: PracticeProblem): string {
   return `${problem.firstNumber} × ${problem.secondNumber}`;
+}
+
+/**
+ * Formats equation with dynamic padding based on current digit position
+ * Only pads when hints are enabled and only as much as needed for current digit
+ * @param equation - Original equation string
+ * @param indexCount - Current digit position (0-6)
+ * @param hintsEnabled - Whether hints are enabled
+ */
+export function formatEquationWithPadding(
+  equation: string,
+  indexCount: number,
+  hintsEnabled: boolean
+): string {
+  if (!hintsEnabled) {
+    return equation;
+  }
+
+  const parts = equation.split(' × ');
+  const firstStr = parts[0];
+  const secondStr = parts[1];
+
+  // Calculate padding needed: for indexCount N, if we need to access position N
+  // and firstStr has length L, we need (N - L + 1) leading zeros
+  const originalLength = firstStr.length;
+  const zerosNeeded = Math.max(0, indexCount - originalLength + 1);
+
+  if (zerosNeeded === 0) {
+    return equation;
+  }
+
+  const paddedFirst = '0'.repeat(zerosNeeded) + firstStr;
+  return `${paddedFirst} × ${secondStr}`;
 }
 
 /**
