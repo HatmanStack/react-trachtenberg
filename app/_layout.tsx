@@ -39,7 +39,7 @@ function TabLayout() {
       <Tabs.Screen
         name="practice"
         options={{
-          title: 'Practice',
+          title: 'Trachtenberg',
           tabBarAccessibilityLabel: 'Navigate to Practice',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="pencil" size={24} color={color} />
@@ -49,7 +49,7 @@ function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: 'Trachtenberg',
           tabBarAccessibilityLabel: 'Navigate to Settings',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="cog" size={24} color={color} />
