@@ -82,7 +82,7 @@ export default function LearnScreen() {
 
           {/* Page Indicator */}
           <Text variant="bodySmall" style={styles.pageIndicator}>
-            Step {currentPage + 1} of 18
+            Step {currentPage + 1} of 21
           </Text>
       </View>
 
