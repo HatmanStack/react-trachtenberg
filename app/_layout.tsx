@@ -12,6 +12,7 @@ function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: '#757575',
+        tabBarShowLabel: Platform.OS === 'web',
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           height: Platform.OS === 'web' ? 60 : undefined,
