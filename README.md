@@ -1,6 +1,6 @@
 <div align="center">
 
-# Trachtenberg Multiplicaiton - React Native
+# Trachtenberg Multiplication - React Native
 
 [![](https://img.shields.io/badge/React%20Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 [![](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
