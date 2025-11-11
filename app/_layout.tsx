@@ -2,17 +2,19 @@ import { Tabs } from 'expo-router';
 import { PaperProvider, useTheme } from 'react-native-paper';
 import { paperTheme } from '../src/theme/paperTheme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Platform } from 'react-native';
+import { Platform, useWindowDimensions } from 'react-native';
 
 function TabLayout() {
   const theme = useTheme();
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width > 768;
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: '#757575',
-        tabBarShowLabel: Platform.OS === 'web',
+        tabBarShowLabel: isLargeScreen,
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           height: Platform.OS === 'web' ? 60 : undefined,
