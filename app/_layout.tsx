@@ -30,6 +30,7 @@ function TabLayout() {
         name="index"
         options={{
           title: 'Trachtenberg',
+          tabBarLabel: 'Learn',
           tabBarAccessibilityLabel: 'Navigate to Tutorial',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="school" size={24} color={color} />
@@ -40,6 +41,7 @@ function TabLayout() {
         name="practice"
         options={{
           title: 'Trachtenberg',
+          tabBarLabel: 'Practice',
           tabBarAccessibilityLabel: 'Navigate to Practice',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="pencil" size={24} color={color} />
@@ -50,6 +52,7 @@ function TabLayout() {
         name="settings"
         options={{
           title: 'Trachtenberg',
+          tabBarLabel: 'Settings',
           tabBarAccessibilityLabel: 'Navigate to Settings',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="cog" size={24} color={color} />
