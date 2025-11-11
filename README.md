@@ -1,20 +1,21 @@
 <div align="center">
+
+# Trachtenberg Multiplicaiton - React Native
+
 [![](https://img.shields.io/badge/React%20Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 [![](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
 [![](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![](https://img.shields.io/badge/Zustand-454545?style=for-the-badge&logo=zustand&logoColor=white)](https://github.com/pmndrs/zustand)
 
-# Trachtenberg Multiplication - React Native
+A cross-platform mobile and web application to teach the [Trachtenberg method](https://en.wikipedia.org/wiki/Trachtenberg_system) of multiplication, a system of rapid mental calculation. The system was created by Jakow Trachtenberg, a Russian Jew, while in a Nazi concentration camp.
 
-A cross-platform mobile and web application to teach the [Trachtenberg method](https://en.wikipedia.org/wiki/Trachtenberg_system) of multiplication, a system of rapid mental calculation. This is a modern React Native (Expo) migration of the original [Android app](https://github.com/HatmanStack/android-trachtenberg).
-
-The system was created by Jakow Trachtenberg, a Russian Jew, while in a Nazi concentration camp.
-
-<p align="center">
-  <img width="600" src="assets/banner.png" alt="Trachtenberg App Banner">
-</p>
-</div>
 ---
+
+![Trachtenberg App Banner](assets/banner.png)
+
+---
+
+</div>
 
 ## ✨ Features
 
