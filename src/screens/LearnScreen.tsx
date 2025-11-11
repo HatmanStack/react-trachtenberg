@@ -189,8 +189,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: '20%',
   },
   button: {
-    flex: 1,
     marginHorizontal: SPACING.sm,
-    maxWidth: isLargeScreen ? 200 : undefined,
   },
 });
