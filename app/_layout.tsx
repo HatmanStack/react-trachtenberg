@@ -22,7 +22,6 @@ function TabLayout() {
           fontSize: 22,
           fontWeight: '600',
           textTransform: 'none',
-          marginTop: -4,
         },
         headerShown: true,
       }}
