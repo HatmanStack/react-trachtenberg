@@ -15,11 +15,14 @@ function TabLayout() {
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           height: Platform.OS === 'web' ? 60 : undefined,
+          paddingTop: 0,
+          paddingBottom: 4,
         },
         tabBarLabelStyle: {
-          fontSize: 16,
+          fontSize: 22,
           fontWeight: '600',
           textTransform: 'none',
+          marginTop: -4,
         },
         headerShown: true,
       }}
