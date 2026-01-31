@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { StyleSheet, View, ScrollView, Dimensions } from 'react-native';
+import { StyleSheet, View, Dimensions } from 'react-native';
 import { Surface, Text, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useTutorialNavigation } from '../hooks/useTutorialNavigation';
