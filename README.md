@@ -13,7 +13,7 @@ A cross-platform mobile and web application to teach the [Trachtenberg method](h
 
 ---
 
-![Trachtenberg App Banner](assets/banner.png)
+![Trachtenberg App Banner](public/og-image.jpg)
 
 ---
 

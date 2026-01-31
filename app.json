@@ -34,7 +34,13 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
-      "output": "static"
+      "output": "static",
+      "name": "Trachtenberg Multiplication",
+      "shortName": "Trachtenberg",
+      "description": "Learn the Trachtenberg system of rapid mental multiplication with interactive tutorials and practice exercises",
+      "lang": "en",
+      "themeColor": "#9fa8da",
+      "backgroundColor": "#9fa8da"
     },
     "plugins": [
       "expo-router"

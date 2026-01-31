@@ -1,0 +1,10 @@
+# Robots.txt for Trachtenberg Multiplication App
+# https://trachtenberg.hatstack.fun
+
+User-agent: *
+Allow: /
+Allow: /practice
+Disallow: /settings
+
+# Sitemap location
+Sitemap: https://trachtenberg.hatstack.fun/sitemap.xml
