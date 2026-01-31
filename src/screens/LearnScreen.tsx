@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { StyleSheet, View, Dimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions, Platform } from 'react-native';
 import { Surface, Text, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useTutorialNavigation } from '../hooks/useTutorialNavigation';
@@ -8,11 +8,11 @@ import { getTutorialHighlightIndices } from '../utils/tutorialHighlighter';
 import { HighlightedText } from '../components/HighlightedText';
 import { COLORS, SPACING } from '../theme/constants';
 
-const { width } = Dimensions.get('window');
-const isLargeScreen = width > 768;
-
 export default function LearnScreen() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width > 768;
+
   const {
     currentPage,
     goNext,
@@ -23,6 +23,12 @@ export default function LearnScreen() {
   } = useTutorialNavigation();
 
   console.log('LearnScreen render, currentPage:', currentPage);
+
+  // Bottom margin: larger screens need more space from tab bar
+  const buttonBottomMargin = Platform.select({
+    web: isLargeScreen ? 48 : 12,
+    default: 24,
+  });
 
   const currentStep = tutorialSteps[currentPage];
   const highlightIndices = getTutorialHighlightIndices(currentStep.answer);
@@ -43,7 +49,7 @@ export default function LearnScreen() {
   }, [goPrevious, currentPage]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isLargeScreen && styles.containerLarge]}>
       <View style={isLargeScreen ? styles.innerContainer : undefined}>
           {/* Explanation Section */}
             <Surface style={styles.explanationSurface}>
@@ -87,7 +93,11 @@ export default function LearnScreen() {
       </View>
 
       {/* Navigation Buttons */}
-      <View style={[styles.buttonContainer, isLargeScreen && styles.buttonContainerLarge]}>
+      <View style={[
+        styles.buttonContainer,
+        isLargeScreen && styles.buttonContainerLarge,
+        { marginBottom: buttonBottomMargin }
+      ]}>
         <Button
           mode="contained"
           onPress={handlePrevious}
@@ -115,7 +125,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     padding: SPACING.md,
     paddingBottom: 100,
-    alignItems: isLargeScreen ? 'center' : 'stretch',
+  },
+  containerLarge: {
+    alignItems: 'center',
   },
   innerContainer: {
     maxWidth: 600,
@@ -178,17 +190,20 @@ const styles = StyleSheet.create({
     color: COLORS.disabled,
   },
   buttonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: SPACING.md,
     backgroundColor: COLORS.surface,
-    elevation: 4,
+    zIndex: 10,
   },
   buttonContainerLarge: {
     justifyContent: 'center',
-    paddingHorizontal: '20%',
   },
   button: {
-    marginHorizontal: SPACING.sm,
+    marginHorizontal: SPACING.lg,
   },
 });

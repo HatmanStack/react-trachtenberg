@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import { PaperProvider, useTheme } from 'react-native-paper';
 import { paperTheme } from '../src/theme/paperTheme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Platform, useWindowDimensions } from 'react-native';
+import { Platform, useWindowDimensions, View, StyleSheet } from 'react-native';
 
 function TabLayout() {
   const theme = useTheme();
@@ -75,7 +75,24 @@ function TabLayout() {
 export default function RootLayout() {
   return (
     <PaperProvider theme={paperTheme}>
-      <TabLayout />
+      <View style={styles.outer}>
+        <View style={styles.container}>
+          <TabLayout />
+        </View>
+      </View>
     </PaperProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  outer: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: paperTheme.colors.background,
+  },
+  container: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 900,
+  },
+});
