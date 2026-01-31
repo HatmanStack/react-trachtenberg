@@ -62,9 +62,9 @@ describe('useTutorialNavigation', () => {
   });
 
   test('cannot go next from last page', () => {
-    // Set to last page (17)
+    // Set to last page (20)
     act(() => {
-      useAppStore.getState().setTutorialPage(17);
+      useAppStore.getState().setTutorialPage(20);
     });
 
     const { result } = renderHook(() => useTutorialNavigation());
@@ -76,7 +76,7 @@ describe('useTutorialNavigation', () => {
       result.current.goNext();
     });
 
-    expect(result.current.currentPage).toBe(17);
+    expect(result.current.currentPage).toBe(20);
   });
 
   test('reset returns to page 0', () => {
@@ -106,6 +106,6 @@ describe('useTutorialNavigation', () => {
 
   test('totalPages is correct', () => {
     const { result } = renderHook(() => useTutorialNavigation());
-    expect(result.current.totalPages).toBe(18);
+    expect(result.current.totalPages).toBe(21);
   });
 });

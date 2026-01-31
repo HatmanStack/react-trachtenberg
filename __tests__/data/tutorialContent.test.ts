@@ -2,8 +2,8 @@ import { tutorialSteps, TUTORIAL_EQUATION, TUTORIAL_STEP_COUNT } from '../../src
 
 describe('Tutorial Content', () => {
   test('has correct number of steps', () => {
-    expect(tutorialSteps.length).toBe(18);
-    expect(TUTORIAL_STEP_COUNT).toBe(18);
+    expect(tutorialSteps.length).toBe(21);
+    expect(TUTORIAL_STEP_COUNT).toBe(21);
   });
 
   test('has correct equation constant', () => {
@@ -18,15 +18,15 @@ describe('Tutorial Content', () => {
   });
 
   test('step 2 has first calculation', () => {
-    expect(tutorialSteps[2].explanation).toBe('Find the Second Digit');
+    expect(tutorialSteps[2].explanation).toBe('Find the First Digit');
     expect(tutorialSteps[2].answer).toContain('9 x 6 = 54');
     expect(tutorialSteps[2].bottomArrow).toBe('4');
   });
 
   test('final step has completion message', () => {
-    expect(tutorialSteps[17].explanation).toContain('Continue this to find the last Four digits');
-    expect(tutorialSteps[17].explanation).toContain('Click Next Practice');
-    expect(tutorialSteps[17].bottomArrow).toBe('6784');
+    expect(tutorialSteps[20].explanation).toContain('Why Padding Matters');
+    expect(tutorialSteps[20].answer).toContain('Click Next to Practice');
+    expect(tutorialSteps[20].bottomArrow).toBe('6784');
   });
 
   test('all steps have required properties', () => {
