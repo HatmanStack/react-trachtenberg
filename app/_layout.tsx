@@ -62,6 +62,12 @@ function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="+not-found"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
