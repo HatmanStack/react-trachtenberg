@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { StyleSheet, View, Alert, Animated, Dimensions } from 'react-native';
+import { StyleSheet, View, ScrollView, Alert, Animated, Dimensions } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 import { useAppStore } from '../store/appStore';
 import { AnswerButton } from '../components/AnswerButton';
@@ -168,55 +168,61 @@ export default function PracticeScreen() {
   }, [hintsEnabled, move, submitAnswer, showFeedback, showHints, hideHints, answerChoices, correctAnswerIndex]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={[
+        styles.scrollContent,
+        isLargeScreen && styles.scrollContentLarge,
+      ]}
+    >
       <View style={isLargeScreen ? styles.innerContainer : undefined}>
         {/* Equation Display */}
         <Surface style={styles.equationSurface}>
-        {hintsEnabled && hintHighlightIndices.length > 0 ? (
-          <HighlightedText
-            text={displayedEquation}
-            highlightIndices={hintHighlightIndices}
-            highlightColor={COLORS.accent}
-            style={styles.equation}
+          {hintsEnabled && hintHighlightIndices.length > 0 ? (
+            <HighlightedText
+              text={displayedEquation}
+              highlightIndices={hintHighlightIndices}
+              highlightColor={COLORS.accent}
+              style={styles.equation}
+            />
+          ) : (
+            <Text variant="headlineLarge" style={styles.equation}>
+              {displayedEquation}
+            </Text>
+          )}
+        </Surface>
+
+        {/* Hint Display */}
+        <Animated.View style={{ opacity: hintOpacity }} pointerEvents="box-none">
+          <HintDisplay
+            question={hintQuestion}
+            result={hintResult}
+            visible={hintsEnabled}
+            onPress={handleHintPress}
           />
-        ) : (
-          <Text variant="headlineLarge" style={styles.equation}>
-            {displayedEquation}
-          </Text>
-        )}
-      </Surface>
-
-      {/* Hint Display */}
-      <Animated.View style={{ opacity: hintOpacity }} pointerEvents="box-none">
-        <HintDisplay
-          question={hintQuestion}
-          result={hintResult}
-          visible={hintsEnabled}
-          onPress={handleHintPress}
-        />
-      </Animated.View>
-
-      {/* Answer Progress */}
-      <Surface style={styles.progressSurface}>
-        <Text variant="headlineMedium" style={styles.progress}>
-          {answerProgress || '?'}
-        </Text>
-      </Surface>
-
-      {/* Feedback Text */}
-      {feedbackText && (
-        <Animated.View style={{ opacity: feedbackOpacity }}>
-          <Text
-            variant="titleLarge"
-            style={[
-              styles.feedback,
-              feedbackText === 'Wrong' ? styles.feedbackWrong : styles.feedbackCorrect,
-            ]}
-          >
-            {feedbackText}
-          </Text>
         </Animated.View>
-      )}
+
+        {/* Answer Progress */}
+        <Surface style={styles.progressSurface}>
+          <Text variant="headlineMedium" style={styles.progress}>
+            {answerProgress || '?'}
+          </Text>
+        </Surface>
+
+        {/* Feedback Text */}
+        {feedbackText && (
+          <Animated.View style={{ opacity: feedbackOpacity }}>
+            <Text
+              variant="titleLarge"
+              style={[
+                styles.feedback,
+                feedbackText === 'Wrong' ? styles.feedbackWrong : styles.feedbackCorrect,
+              ]}
+            >
+              {feedbackText}
+            </Text>
+          </Animated.View>
+        )}
 
         {/* Answer Buttons */}
         <View style={styles.buttonsContainer}>
@@ -242,17 +248,22 @@ export default function PracticeScreen() {
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
     padding: SPACING.md,
-    alignItems: isLargeScreen ? 'center' : 'stretch',
     justifyContent: 'center',
+  },
+  scrollContentLarge: {
+    alignItems: 'center',
   },
   innerContainer: {
     maxWidth: 600,
@@ -301,8 +312,7 @@ const styles = StyleSheet.create({
     color: COLORS.accent,
   },
   buttonsContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    marginTop: SPACING.md,
     width: '100%',
   },
   buttonRow: {

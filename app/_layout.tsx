@@ -1,20 +1,21 @@
 import { Tabs } from 'expo-router';
 import { PaperProvider, useTheme } from 'react-native-paper';
 import { paperTheme } from '../src/theme/paperTheme';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Platform, useWindowDimensions, View, StyleSheet } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Platform, View, StyleSheet, useWindowDimensions } from 'react-native';
 
 function TabLayout() {
   const theme = useTheme();
   const { width } = useWindowDimensions();
-  const isLargeScreen = width > 768;
+  const showLabels = width > 500;
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: '#757575',
-        tabBarShowLabel: isLargeScreen,
+        tabBarShowLabel: showLabels,
+        tabBarLabelPosition: 'beside-icon',
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           height: Platform.OS === 'web' ? 60 : undefined,
@@ -35,8 +36,8 @@ function TabLayout() {
           title: 'Trachtenberg',
           tabBarLabel: 'Learn',
           tabBarAccessibilityLabel: 'Navigate to Tutorial',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="school" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons name={focused ? 'school' : 'school-outline'} size={24} color={color} />
           ),
         }}
       />
@@ -46,8 +47,8 @@ function TabLayout() {
           title: 'Trachtenberg',
           tabBarLabel: 'Practice',
           tabBarAccessibilityLabel: 'Navigate to Practice',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="pencil" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons name={focused ? 'pencil' : 'pencil-outline'} size={24} color={color} />
           ),
         }}
       />
@@ -57,8 +58,8 @@ function TabLayout() {
           title: 'Trachtenberg',
           tabBarLabel: 'Settings',
           tabBarAccessibilityLabel: 'Navigate to Settings',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="cog" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons name={focused ? 'cog' : 'cog-outline'} size={24} color={color} />
           ),
         }}
       />
@@ -76,9 +77,7 @@ export default function RootLayout() {
   return (
     <PaperProvider theme={paperTheme}>
       <View style={styles.outer}>
-        <View style={styles.container}>
-          <TabLayout />
-        </View>
+        <TabLayout />
       </View>
     </PaperProvider>
   );
@@ -87,12 +86,6 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   outer: {
     flex: 1,
-    alignItems: 'center',
     backgroundColor: paperTheme.colors.background,
-  },
-  container: {
-    flex: 1,
-    width: '100%',
-    maxWidth: 900,
   },
 });
