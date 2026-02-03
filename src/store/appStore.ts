@@ -4,6 +4,11 @@ import { generateAnswerChoices, getDigitAtPosition } from '../utils/answerChoice
 import { validateAnswer } from '../utils/answerValidator';
 import { getMoveRange } from '../utils/hintMoveTracker';
 import { calculateHintStep } from '../utils/hintCalculator';
+import { logger } from '../utils/logger';
+import { PROBLEM_COMPLETE_DELAY_MS } from '../constants/algorithm';
+
+// Module-scoped timeout ID for problem completion delay
+let problemCompleteTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 interface AppState {
   // Settings
@@ -19,7 +24,7 @@ interface AppState {
   answerProgress: string;            // Partial answer built so far
   indexCount: number;                // Current digit position (0-based from right)
   firstCharRemainder: number;        // Carry from previous digit calculation
-  answerChoices: number[];           // Four button values [0-9]
+  answerChoices: readonly [number, number, number, number] | readonly [];  // Four button values [0-9]
   correctAnswerIndex: number;        // Which button (0-3) is correct
 
   // Hint system state
@@ -72,15 +77,15 @@ export const useAppStore = create<AppState>()((set, get) => ({
       setHintsEnabled: (enabled) => set({ hintsEnabled: enabled }),
       setHintHelpShown: (shown) => set({ hintHelpShown: shown }),
       setTutorialPage: (page) => {
-        console.log('setTutorialPage called with:', page);
+        logger.debug('setTutorialPage called with:', page);
         set({ tutorialPage: page });
       },
 
       // Practice actions
       generateNewProblem: () => {
-        console.log('generateNewProblem called in store');
+        logger.debug('generateNewProblem called in store');
         const problem = generateProblem();
-        console.log('Generated problem:', problem);
+        logger.debug('Generated problem:', problem);
         const equation = formatEquation(problem);
         const answer = problem.answer.toString();
 
@@ -91,8 +96,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
         // Initialize hint state for first digit (indexCount = 0)
         const { startMove, moveCount } = getMoveRange(0);
 
-        console.log('Setting state with equation:', equation);
-        console.log('Initial hint state - startMove:', startMove, 'moveCount:', moveCount);
+        logger.debug('Setting state with equation:', equation);
+        logger.debug('Initial hint state - startMove:', startMove, 'moveCount:', moveCount);
         set({
           currentEquation: equation,
           currentAnswer: answer,
@@ -113,8 +118,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
       submitAnswer: (buttonIndex: number) => {
         const state = get();
-        console.log('submitAnswer called - buttonIndex:', buttonIndex, 'correctIndex:', state.correctAnswerIndex);
-        console.log('submitAnswer - current state: indexCount:', state.indexCount, 'answerProgress:', state.answerProgress);
+        logger.debug('submitAnswer called - buttonIndex:', buttonIndex, 'correctIndex:', state.correctAnswerIndex);
+        logger.debug('submitAnswer - current state: indexCount:', state.indexCount, 'answerProgress:', state.answerProgress);
 
         const result = validateAnswer(
           buttonIndex,
@@ -124,10 +129,10 @@ export const useAppStore = create<AppState>()((set, get) => ({
           state.firstCharRemainder
         );
 
-        console.log('submitAnswer - validateAnswer result:', result);
+        logger.debug('submitAnswer - validateAnswer result:', result);
 
         if (!result.isCorrect) {
-          console.log('submitAnswer - wrong answer, returning');
+          logger.debug('submitAnswer - wrong answer, returning');
           return { isCorrect: false, isComplete: false };
         }
 
@@ -139,30 +144,35 @@ export const useAppStore = create<AppState>()((set, get) => ({
             firstCharRemainder: result.newRemainder,
           });
 
-          setTimeout(() => {
+          // Clear any existing timeout before setting new one
+          if (problemCompleteTimeoutId !== null) {
+            clearTimeout(problemCompleteTimeoutId);
+          }
+          problemCompleteTimeoutId = setTimeout(() => {
+            problemCompleteTimeoutId = null;
             get().generateNewProblem();
-          }, 2000);
+          }, PROBLEM_COMPLETE_DELAY_MS);
           return { isCorrect: true, isComplete: true };
         }
 
         // Generate new choices for next digit
-        console.log('submitAnswer - generating new choices for next digit at indexCount:', result.newIndexCount);
+        logger.debug('submitAnswer - generating new choices for next digit at indexCount:', result.newIndexCount);
         const nextDigit = getDigitAtPosition(
           parseInt(state.currentAnswer, 10),
           result.newIndexCount
         );
-        console.log('submitAnswer - nextDigit:', nextDigit);
+        logger.debug('submitAnswer - nextDigit:', nextDigit);
 
         const { choices, correctIndex } = generateAnswerChoices(nextDigit);
-        console.log('submitAnswer - new choices:', choices, 'correctIndex:', correctIndex);
+        logger.debug('submitAnswer - new choices:', choices, 'correctIndex:', correctIndex);
 
         // Calculate carry digit for next position (Android lines 367-375)
         const carryDigit = Math.floor(state.remainderHint / 10);
-        console.log('submitAnswer - carry digit:', carryDigit);
+        logger.debug('submitAnswer - carry digit:', carryDigit);
 
         // Get hint state for next digit
         const { startMove, moveCount } = getMoveRange(result.newIndexCount);
-        console.log('submitAnswer - new hint range: startMove:', startMove, 'moveCount:', moveCount);
+        logger.debug('submitAnswer - new hint range: startMove:', startMove, 'moveCount:', moveCount);
 
         // Update state for next digit
         set({
@@ -180,11 +190,16 @@ export const useAppStore = create<AppState>()((set, get) => ({
           hintHighlightIndices: [],
         });
 
-        console.log('submitAnswer - state updated with new choices');
+        logger.debug('submitAnswer - state updated with new choices');
         return { isCorrect: true, isComplete: false };
       },
 
       resetPractice: () => {
+        // Clear any pending timeout
+        if (problemCompleteTimeoutId !== null) {
+          clearTimeout(problemCompleteTimeoutId);
+          problemCompleteTimeoutId = null;
+        }
         set({
           currentEquation: '',
           currentAnswer: '',
@@ -206,11 +221,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
       nextHint: () => {
         const state = get();
 
-        console.log('nextHint called - move:', state.move, 'moveCount:', state.moveCount, 'indexCount:', state.indexCount);
+        logger.debug('nextHint called - move:', state.move, 'moveCount:', state.moveCount, 'indexCount:', state.indexCount);
 
         // Check if we've reached moveCount
         if (state.move >= state.moveCount) {
-          console.log('nextHint: reached moveCount, returning');
+          logger.debug('nextHint: reached moveCount, returning');
           return; // No more hints for this digit
         }
 
@@ -222,11 +237,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
           state.indexCount
         );
 
-        console.log('nextHint: calculated hintStep', JSON.stringify(hintStep, null, 2));
+        logger.debug('nextHint: calculated hintStep', JSON.stringify(hintStep, null, 2));
 
         const newHintResult = state.hintResult + hintStep.resultDisplay;
-        console.log('nextHint: updating hintQuestion to:', hintStep.question);
-        console.log('nextHint: updating hintResult to:', newHintResult);
+        logger.debug('nextHint: updating hintQuestion to:', hintStep.question);
+        logger.debug('nextHint: updating hintResult to:', newHintResult);
 
         // Update state with hint information
         set({
@@ -237,11 +252,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
           hintHighlightIndices: hintStep.highlightIndices,
         });
 
-        console.log('nextHint: updated state, new move:', state.move + 1);
+        logger.debug('nextHint: updated state, new move:', state.move + 1);
 
         // Log the updated state to verify
         const newState = get();
-        console.log('nextHint: verified new state - question:', newState.hintQuestion, 'result:', newState.hintResult);
+        logger.debug('nextHint: verified new state - question:', newState.hintQuestion, 'result:', newState.hintResult);
       },
 
       resetHints: () => {

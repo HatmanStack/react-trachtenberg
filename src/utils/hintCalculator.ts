@@ -12,12 +12,13 @@
  */
 
 import { getDigitIndices, getMoveRange } from './hintMoveTracker';
+import { logger } from './logger';
 
 /**
  * Moves that complete a digit (no " + " suffix in result display)
  * These are the last move of each digit: moveCount - 1
  */
-const COMPLETE_DIGIT_MOVES = [0, 3, 8, 14, 20, 26, 32];
+const COMPLETE_DIGIT_MOVES = [0, 3, 8, 14, 20, 26, 32] as const;
 
 /**
  * Result type for calculateHintStep function
@@ -40,17 +41,34 @@ export interface HintStepResult {
  * @param indexCount - Current digit position being calculated (0-6, right to left)
  * @returns Hint step information
  */
+const DEFAULT_HINT_RESULT: HintStepResult = {
+  question: '0 × 0',
+  digitToAdd: 0,
+  newRemainder: 0,
+  resultDisplay: '0',
+  highlightIndices: [],
+};
+
 export function calculateHintStep(
   equation: string,
   move: number,
   currentRemainder: number,
   indexCount: number
 ): HintStepResult {
-  // 1. Split equation into first and second numbers (Android lines 221-222)
-  // Equation format: "firstNum × secondNum" (using U+00D7 multiplication sign)
-  const parts = equation.split(' × ');
-  let firstString = parts[0];
-  const secondString = parts[1];
+  try {
+    // 1. Split equation into first and second numbers (Android lines 221-222)
+    // Equation format: "firstNum × secondNum" (using U+00D7 multiplication sign)
+    const parts = equation.split(' × ');
+    let firstString = parts[0] ?? '';
+    const secondString = parts[1] ?? '';
+
+    if (!firstString || !secondString) {
+      // Return safe default for malformed equation
+      return {
+        ...DEFAULT_HINT_RESULT,
+        newRemainder: currentRemainder,
+      };
+    }
 
   // Pad first number internally for calculations
   // Need to pad to at least (indexCount + 1) digits to access position indexCount
@@ -73,8 +91,8 @@ export function calculateHintStep(
   const firstActualIndex = firstString.length - 1 - firstStringIndex;
   const secondActualIndex = secondString.length - 1 - secondStringIndex;
 
-  const firstChar = firstString[firstActualIndex];
-  const secondChar = secondString[secondActualIndex];
+  const firstChar = firstString[firstActualIndex] ?? '0';
+  const secondChar = secondString[secondActualIndex] ?? '0';
 
   // 4. Create question string (Android line 229)
   // Use × symbol instead of *
@@ -91,10 +109,8 @@ export function calculateHintStep(
   // 7. Determine which digit to use based on localMove
   // Pattern: even localMove (0,2,4,...) uses units digit, odd (1,3,5,...) uses tens
   const useUnits = localMove % 2 === 0;
-  const digitToAdd = parseInt(
-    useUnits ? productString[1] : productString[0],
-    10
-  );
+  const digitChar = useUnits ? productString[1] : productString[0];
+  const digitToAdd = parseInt(digitChar ?? '0', 10);
 
   // 8. Update remainder (Android line 255)
   // Handle NaN by treating as 0
@@ -103,7 +119,7 @@ export function calculateHintStep(
   const newRemainder = safeCurrentRemainder + safeDigitToAdd;
 
   // 9. Format result display (Android lines 258-261)
-  const isComplete = COMPLETE_DIGIT_MOVES.includes(move);
+  const isComplete = (COMPLETE_DIGIT_MOVES as readonly number[]).includes(move);
   const resultDisplay = safeDigitToAdd + (isComplete ? '' : ' + ');
 
   // 10. Calculate highlight indices (Android lines 234-238)
@@ -115,11 +131,18 @@ export function calculateHintStep(
     secondActualIndex + firstString.length + 3, // +3 for " × "
   ];
 
-  return {
-    question,
-    digitToAdd: safeDigitToAdd,
-    newRemainder,
-    resultDisplay,
-    highlightIndices,
-  };
+    return {
+      question,
+      digitToAdd: safeDigitToAdd,
+      newRemainder,
+      resultDisplay,
+      highlightIndices,
+    };
+  } catch (error) {
+    logger.error('Error in calculateHintStep:', error);
+    return {
+      ...DEFAULT_HINT_RESULT,
+      newRemainder: currentRemainder,
+    };
+  }
 }

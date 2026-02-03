@@ -7,6 +7,13 @@ import { HintDisplay } from '../components/HintDisplay';
 import { HighlightedText } from '../components/HighlightedText';
 import { COLORS, SPACING } from '../theme/constants';
 import { formatEquationWithPadding } from '../utils/problemGenerator';
+import { logger } from '../utils/logger';
+import {
+  FEEDBACK_DISPLAY_DURATION_MS,
+  FEEDBACK_COMPLETE_DURATION_MS,
+  HINT_ANIMATION_DURATION_MS,
+  MIN_HINTS_BEFORE_ANSWER,
+} from '../constants/algorithm';
 
 const { width } = Dimensions.get('window');
 const isLargeScreen = width > 768;
@@ -40,9 +47,9 @@ export default function PracticeScreen() {
   }, [currentEquation, indexCount, hintsEnabled]);
 
   // Debug: Log hint state on render
-  console.log('PracticeScreen render - move:', move, 'moveCount:', moveCount, 'hintsEnabled:', hintsEnabled);
-  console.log('PracticeScreen render - hintQuestion:', hintQuestion, 'hintResult:', hintResult);
-  console.log('PracticeScreen render - answerChoices:', answerChoices, 'indexCount:', indexCount, 'answerProgress:', answerProgress);
+  logger.debug('PracticeScreen render - move:', move, 'moveCount:', moveCount, 'hintsEnabled:', hintsEnabled);
+  logger.debug('PracticeScreen render - hintQuestion:', hintQuestion, 'hintResult:', hintResult);
+  logger.debug('PracticeScreen render - answerChoices:', answerChoices, 'indexCount:', indexCount, 'answerProgress:', answerProgress);
 
   // Animated values for feedback and hint display
   const feedbackOpacity = useRef(new Animated.Value(0)).current;
@@ -54,7 +61,7 @@ export default function PracticeScreen() {
     feedbackOpacity.setValue(1);
 
     // Fade out after delay
-    const duration = isComplete ? 10000 : 1000;
+    const duration = isComplete ? FEEDBACK_COMPLETE_DURATION_MS : FEEDBACK_DISPLAY_DURATION_MS;
 
     Animated.timing(feedbackOpacity, {
       toValue: 0,
@@ -65,13 +72,13 @@ export default function PracticeScreen() {
   }, [feedbackOpacity]);
 
   const showHints = useCallback(() => {
-    console.log('showHints called - animating hintOpacity to 1');
+    logger.debug('showHints called - animating hintOpacity to 1');
     Animated.timing(hintOpacity, {
       toValue: 1,
-      duration: 500,
+      duration: HINT_ANIMATION_DURATION_MS,
       useNativeDriver: true,
     }).start(() => {
-      console.log('showHints animation completed');
+      logger.debug('showHints animation completed');
     });
   }, [hintOpacity]);
 
@@ -81,33 +88,33 @@ export default function PracticeScreen() {
 
   // Generate first problem on mount
   useEffect(() => {
-    console.log('PracticeScreen mounted, currentEquation:', currentEquation);
+    logger.debug('PracticeScreen mounted, currentEquation:', currentEquation);
     if (!currentEquation) {
-      console.log('Calling generateNewProblem...');
+      logger.debug('Calling generateNewProblem...');
       generateNewProblem();
-      console.log('After generateNewProblem call');
+      logger.debug('After generateNewProblem call');
     }
   }, [currentEquation, generateNewProblem]);
 
   // Show hints when problem loads and hints are enabled
   useEffect(() => {
     if (currentEquation && hintsEnabled) {
-      console.log('useEffect: Showing hints for equation:', currentEquation);
+      logger.debug('useEffect: Showing hints for equation:', currentEquation);
       showHints();
       // Call nextHint to show the first hint step
       if (move === 0 && hintQuestion === '') {
-        console.log('useEffect: Initializing first hint');
+        logger.debug('useEffect: Initializing first hint');
         nextHint();
       }
     }
   }, [currentEquation, hintsEnabled, showHints, move, hintQuestion, nextHint]);
 
   const handleHintPress = useCallback(() => {
-    console.log('handleHintPress - move:', move, 'moveCount:', moveCount, 'can advance:', move < moveCount);
+    logger.debug('handleHintPress - move:', move, 'moveCount:', moveCount, 'can advance:', move < moveCount);
 
     // Advance to next hint if available
     if (move < moveCount) {
-      console.log('Calling nextHint from handleHintPress');
+      logger.debug('Calling nextHint from handleHintPress');
       nextHint();
 
       // Show help message after first successful hint advance (not blocking)
@@ -118,41 +125,41 @@ export default function PracticeScreen() {
         }, 100);
       }
     } else {
-      console.log('Cannot advance - move >= moveCount');
+      logger.debug('Cannot advance - move >= moveCount');
     }
   }, [hintHelpShown, move, moveCount, setHintHelpShown, nextHint]);
 
   const handleAnswerPress = useCallback((buttonIndex: number) => {
-    console.log('handleAnswerPress called - buttonIndex:', buttonIndex, 'hintsEnabled:', hintsEnabled, 'move:', move, 'moveCount:', moveCount);
-    console.log('handleAnswerPress - current choices:', answerChoices, 'correctIndex:', correctAnswerIndex);
+    logger.debug('handleAnswerPress called - buttonIndex:', buttonIndex, 'hintsEnabled:', hintsEnabled, 'move:', move, 'moveCount:', moveCount);
+    logger.debug('handleAnswerPress - current choices:', answerChoices, 'correctIndex:', correctAnswerIndex);
 
     // Enforce hint viewing when hints enabled
-    // Must view at least 1 hint before answering
-    if (hintsEnabled && move < 1) {
-      console.log('handleAnswerPress - blocked, need to view at least 1 hint. move:', move);
+    // Must view at least MIN_HINTS_BEFORE_ANSWER hints before answering
+    if (hintsEnabled && move < MIN_HINTS_BEFORE_ANSWER) {
+      logger.debug('handleAnswerPress - blocked, need to view at least', MIN_HINTS_BEFORE_ANSWER, 'hint(s). move:', move);
       Alert.alert('View Hints First', 'Tap the hint display at least once to see the calculation steps.');
       return;
     }
 
-    console.log('handleAnswerPress - calling submitAnswer');
+    logger.debug('handleAnswerPress - calling submitAnswer');
     const result = submitAnswer(buttonIndex);
-    console.log('handleAnswerPress - submitAnswer result:', result);
+    logger.debug('handleAnswerPress - submitAnswer result:', result);
 
     if (result.isCorrect) {
       setFeedbackText(result.isComplete ? 'Complete!' : 'Correct!');
       showFeedback(result.isComplete);
 
       if (!result.isComplete) {
-        console.log('handleAnswerPress - correct but not complete, showing hints for next digit');
+        logger.debug('handleAnswerPress - correct but not complete, showing hints for next digit');
         // Show hints for next digit
         showHints();
       } else {
-        console.log('handleAnswerPress - complete! hiding hints');
+        logger.debug('handleAnswerPress - complete! hiding hints');
         // Hide hints when problem is complete
         hideHints();
       }
     } else {
-      console.log('handleAnswerPress - wrong answer');
+      logger.debug('handleAnswerPress - wrong answer');
       setFeedbackText('Wrong');
       showFeedback(false);
       // Hide hints on wrong answer
@@ -215,21 +222,21 @@ export default function PracticeScreen() {
         <View style={styles.buttonsContainer}>
           <View style={styles.buttonRow}>
             <AnswerButton
-              value={answerChoices[0]}
+              value={answerChoices[0] ?? 0}
               onPress={() => handleAnswerPress(0)}
             />
             <AnswerButton
-              value={answerChoices[1]}
+              value={answerChoices[1] ?? 0}
               onPress={() => handleAnswerPress(1)}
             />
           </View>
           <View style={styles.buttonRow}>
             <AnswerButton
-              value={answerChoices[2]}
+              value={answerChoices[2] ?? 0}
               onPress={() => handleAnswerPress(2)}
             />
             <AnswerButton
-              value={answerChoices[3]}
+              value={answerChoices[3] ?? 0}
               onPress={() => handleAnswerPress(3)}
             />
           </View>

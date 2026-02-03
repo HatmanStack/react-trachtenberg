@@ -11,22 +11,28 @@ describe('Tutorial Content', () => {
   });
 
   test('first step contains introduction text', () => {
-    expect(tutorialSteps[0].explanation).toContain('Trachtenberg system');
-    expect(tutorialSteps[0].explanation).toContain('Jakow Trachtenberg');
-    expect(tutorialSteps[0].answer).toBe('');
-    expect(tutorialSteps[0].bottomArrow).toBe('');
+    const step0 = tutorialSteps[0];
+    expect(step0).toBeDefined();
+    expect(step0?.explanation).toContain('Trachtenberg system');
+    expect(step0?.explanation).toContain('Jakow Trachtenberg');
+    expect(step0?.answer).toBe('');
+    expect(step0?.bottomArrow).toBe('');
   });
 
   test('step 2 has first calculation', () => {
-    expect(tutorialSteps[2].explanation).toBe('Find the First Digit');
-    expect(tutorialSteps[2].answer).toContain('9 x 6 = 54');
-    expect(tutorialSteps[2].bottomArrow).toBe('4');
+    const step2 = tutorialSteps[2];
+    expect(step2).toBeDefined();
+    expect(step2?.explanation).toBe('Find the First Digit');
+    expect(step2?.answer).toContain('9 x 6 = 54');
+    expect(step2?.bottomArrow).toBe('4');
   });
 
   test('final step has completion message', () => {
-    expect(tutorialSteps[20].explanation).toContain('Why Padding Matters');
-    expect(tutorialSteps[20].answer).toContain('Click Next to Practice');
-    expect(tutorialSteps[20].bottomArrow).toBe('6784');
+    const step20 = tutorialSteps[20];
+    expect(step20).toBeDefined();
+    expect(step20?.explanation).toContain('Why Padding Matters');
+    expect(step20?.answer).toContain('Click Next to Practice');
+    expect(step20?.bottomArrow).toBe('6784');
   });
 
   test('all steps have required properties', () => {

@@ -1,5 +1,6 @@
 import { useAppStore } from '../store/appStore';
 import { TUTORIAL_STEP_COUNT } from '../data/tutorialContent';
+import { logger } from '../utils/logger';
 
 /**
  * Custom hook for managing tutorial navigation
@@ -10,19 +11,19 @@ export const useTutorialNavigation = () => {
   const setTutorialPage = useAppStore((state) => state.setTutorialPage);
 
   const goNext = () => {
-    console.log('goNext called, current page:', tutorialPage);
+    logger.debug('goNext called, current page:', tutorialPage);
     if (tutorialPage < TUTORIAL_STEP_COUNT - 1) {
       const newPage = tutorialPage + 1;
-      console.log('Setting tutorial page to:', newPage);
+      logger.debug('Setting tutorial page to:', newPage);
       setTutorialPage(newPage);
     }
   };
 
   const goPrevious = () => {
-    console.log('goPrevious called, current page:', tutorialPage);
+    logger.debug('goPrevious called, current page:', tutorialPage);
     if (tutorialPage > 0) {
       const newPage = tutorialPage - 1;
-      console.log('Setting tutorial page to:', newPage);
+      logger.debug('Setting tutorial page to:', newPage);
       setTutorialPage(newPage);
     }
   };

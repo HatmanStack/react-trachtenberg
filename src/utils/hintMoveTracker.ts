@@ -23,7 +23,7 @@
  * indexCount 5: 6 moves [21, 27)
  * indexCount 6: 6 moves [27, 33)
  */
-const MOVES_COUNT = [0, 1, 4, 9, 15, 21, 27, 33];
+const MOVES_COUNT = [0, 1, 4, 9, 15, 21, 27, 33] as const;
 
 /**
  * Result type for getMoveRange function
@@ -59,8 +59,8 @@ export function getMoveRange(indexCount: number): MoveRange {
 
   // Use MOVES_COUNT array for all digit positions
   // MOVES_COUNT[i] = startMove, MOVES_COUNT[i+1] = moveCount
-  const startMove = MOVES_COUNT[indexCount];
-  const moveCount = MOVES_COUNT[indexCount + 1];
+  const startMove = MOVES_COUNT[indexCount] ?? 0;
+  const moveCount = MOVES_COUNT[indexCount + 1] ?? 0;
 
   return { startMove, moveCount };
 }
@@ -138,13 +138,14 @@ export function getDigitIndices(move: number, indexCount: number): DigitIndices 
 
   const pattern = patterns[indexCount];
   if (!pattern || localMove < 0 || localMove >= pattern.length) {
-    console.warn(
-      `No pattern for indexCount=${indexCount}, localMove=${localMove}, move=${move}`
-    );
     return { firstStringIndex: 0, secondStringIndex: 0 };
   }
 
-  const [firstStringIndex, secondStringIndex] = pattern[localMove];
+  const movePattern = pattern[localMove];
+  if (movePattern === undefined) {
+    return { firstStringIndex: 0, secondStringIndex: 0 };
+  }
+  const [firstStringIndex, secondStringIndex] = movePattern;
   return { firstStringIndex, secondStringIndex };
 }
 

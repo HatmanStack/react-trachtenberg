@@ -7,6 +7,7 @@ import { tutorialSteps, TUTORIAL_EQUATION } from '../data/tutorialContent';
 import { getTutorialHighlightIndices } from '../utils/tutorialHighlighter';
 import { HighlightedText } from '../components/HighlightedText';
 import { COLORS, SPACING } from '../theme/constants';
+import { logger } from '../utils/logger';
 
 export default function LearnScreen() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function LearnScreen() {
     canGoPrevious,
   } = useTutorialNavigation();
 
-  console.log('LearnScreen render, currentPage:', currentPage);
+  logger.debug('LearnScreen render, currentPage:', currentPage);
 
   // Bottom margin: larger screens need more space from tab bar
   const buttonBottomMargin = Platform.select({
@@ -31,10 +32,13 @@ export default function LearnScreen() {
   });
 
   const currentStep = tutorialSteps[currentPage];
+  if (!currentStep) {
+    return null;
+  }
   const highlightIndices = getTutorialHighlightIndices(currentStep.answer);
 
   const handleNext = useCallback(() => {
-    console.log(`handleNext called, isLastPage: ${isLastPage}, currentPage: ${currentPage}`);
+    logger.debug(`handleNext called, isLastPage: ${isLastPage}, currentPage: ${currentPage}`);
     if (isLastPage) {
       // Navigate to Practice screen on last page (no animation)
       router.push('/practice');
@@ -44,7 +48,7 @@ export default function LearnScreen() {
   }, [isLastPage, router, goNext, currentPage]);
 
   const handlePrevious = useCallback(() => {
-    console.log(`handlePrevious called, currentPage: ${currentPage}`);
+    logger.debug(`handlePrevious called, currentPage: ${currentPage}`);
     goPrevious();
   }, [goPrevious, currentPage]);
 
