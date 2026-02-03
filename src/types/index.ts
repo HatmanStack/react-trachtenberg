@@ -80,8 +80,8 @@ export function asButtonIndex(value: number): ButtonIndex {
   return value as ButtonIndex;
 }
 
-// Discriminated union for validation results
-export type ValidationResult =
+// Discriminated union for validation outcomes (distinct from answerValidator.ts ValidationResult)
+export type ValidationOutcome =
   | { success: true; isComplete: boolean; newIndexCount: number; newAnswerProgress: string; newRemainder: number }
   | { success: false; error: string };
 

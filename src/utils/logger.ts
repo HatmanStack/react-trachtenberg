@@ -41,9 +41,8 @@ class Logger implements LoggerInterface {
   }
 
   error(...args: unknown[]): void {
-    if (this.shouldLog('error')) {
-      console.error('[ERROR]', ...args);
-    }
+    // Always log errors, even in production
+    console.error('[ERROR]', ...args);
   }
 }
 

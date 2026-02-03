@@ -248,7 +248,7 @@ describe('SettingsScreen', () => {
 
   // Note: Integration with Practice Screen functionality is tested via State Integration tests.
   // The "uses Zustand store for hint state" and "state changes persist across re-renders" tests
-  // verify that store state is properly shared and changes are reflected in the UI.;
+  // verify that store state is properly shared and changes are reflected in the UI.
 
   describe('Edge Cases', () => {
     test('handles rapid toggle changes', () => {

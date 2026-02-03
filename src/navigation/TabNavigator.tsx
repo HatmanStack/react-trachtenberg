@@ -1,7 +1,7 @@
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useTheme } from 'react-native-paper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import LearnScreen from '@screens/LearnScreen';
 import PracticeScreen from '@screens/PracticeScreen';
 import SettingsScreen from '@screens/SettingsScreen';
