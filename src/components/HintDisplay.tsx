@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Surface } from 'react-native-paper';
 import { COLORS, SPACING } from '../theme/constants';
+import { logger } from '../utils/logger';
 
 /**
  * HintDisplay Component
@@ -22,14 +23,14 @@ interface HintDisplayProps {
 
 export const HintDisplay: React.FC<HintDisplayProps> = React.memo(
   ({ question, result, visible, onPress }) => {
-    console.log('HintDisplay render - visible:', visible, 'question:', question, 'result:', result);
+    logger.debug('HintDisplay render - visible:', visible, 'question:', question, 'result:', result);
 
     if (!visible) return null;
 
     return (
       <TouchableOpacity
         onPress={() => {
-          console.log('HintDisplay clicked!');
+          logger.debug('HintDisplay clicked!');
           onPress();
         }}
         activeOpacity={0.7}

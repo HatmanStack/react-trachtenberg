@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { StyleSheet, View, useWindowDimensions, Platform } from 'react-native';
+import { StyleSheet, View, ScrollView, useWindowDimensions } from 'react-native';
 import { Surface, Text, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useTutorialNavigation } from '../hooks/useTutorialNavigation';
@@ -7,6 +7,7 @@ import { tutorialSteps, TUTORIAL_EQUATION } from '../data/tutorialContent';
 import { getTutorialHighlightIndices } from '../utils/tutorialHighlighter';
 import { HighlightedText } from '../components/HighlightedText';
 import { COLORS, SPACING } from '../theme/constants';
+import { logger } from '../utils/logger';
 
 export default function LearnScreen() {
   const router = useRouter();
@@ -22,19 +23,16 @@ export default function LearnScreen() {
     canGoPrevious,
   } = useTutorialNavigation();
 
-  console.log('LearnScreen render, currentPage:', currentPage);
-
-  // Bottom margin: larger screens need more space from tab bar
-  const buttonBottomMargin = Platform.select({
-    web: isLargeScreen ? 48 : 12,
-    default: 24,
-  });
+  logger.debug('LearnScreen render, currentPage:', currentPage);
 
   const currentStep = tutorialSteps[currentPage];
+  if (!currentStep) {
+    return null;
+  }
   const highlightIndices = getTutorialHighlightIndices(currentStep.answer);
 
   const handleNext = useCallback(() => {
-    console.log(`handleNext called, isLastPage: ${isLastPage}, currentPage: ${currentPage}`);
+    logger.debug(`handleNext called, isLastPage: ${isLastPage}, currentPage: ${currentPage}`);
     if (isLastPage) {
       // Navigate to Practice screen on last page (no animation)
       router.push('/practice');
@@ -44,76 +42,84 @@ export default function LearnScreen() {
   }, [isLastPage, router, goNext, currentPage]);
 
   const handlePrevious = useCallback(() => {
-    console.log(`handlePrevious called, currentPage: ${currentPage}`);
+    logger.debug(`handlePrevious called, currentPage: ${currentPage}`);
     goPrevious();
   }, [goPrevious, currentPage]);
 
   return (
-    <View style={[styles.container, isLargeScreen && styles.containerLarge]}>
-      <View style={isLargeScreen ? styles.innerContainer : undefined}>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isLargeScreen && styles.scrollContentLarge,
+        ]}
+      >
+        <View style={isLargeScreen ? styles.innerContainer : undefined}>
           {/* Explanation Section */}
-            <Surface style={styles.explanationSurface}>
-          <Text variant="bodyLarge" style={styles.explanationText}>
-            {currentStep.explanation}
-          </Text>
-        </Surface>
-
-        {/* Equation Display with Highlighting */}
-        <Surface style={styles.equationSurface}>
-          <HighlightedText
-            text={TUTORIAL_EQUATION}
-            highlightIndices={highlightIndices}
-            highlightColor={COLORS.accent}
-            style={styles.equation}
-          />
-        </Surface>
-
-        {/* Answer/Calculation Steps */}
-        {currentStep.answer !== "" && (
-          <Surface style={styles.answerSurface}>
-            <Text variant="bodyMedium" style={styles.answerText}>
-              {currentStep.answer}
+          <Surface style={styles.explanationSurface}>
+            <Text variant="bodyLarge" style={styles.explanationText}>
+              {currentStep.explanation}
             </Text>
           </Surface>
-        )}
 
-        {/* Bottom Arrow (Answer Progress) */}
-        {currentStep.bottomArrow !== "" && (
-          <Surface style={styles.bottomArrowSurface}>
-            <Text variant="headlineLarge" style={styles.bottomArrow}>
-              {currentStep.bottomArrow}
-            </Text>
+          {/* Equation Display with Highlighting */}
+          <Surface style={styles.equationSurface}>
+            <HighlightedText
+              text={TUTORIAL_EQUATION}
+              highlightIndices={highlightIndices}
+              highlightColor={COLORS.accent}
+              style={styles.equation}
+            />
           </Surface>
-        )}
 
-          {/* Page Indicator */}
-          <Text variant="bodySmall" style={styles.pageIndicator}>
-            Step {currentPage + 1} of 21
-          </Text>
-      </View>
+          {/* Answer/Calculation Steps */}
+          {currentStep.answer !== "" && (
+            <Surface style={styles.answerSurface}>
+              <Text variant="bodyMedium" style={styles.answerText}>
+                {currentStep.answer}
+              </Text>
+            </Surface>
+          )}
 
-      {/* Navigation Buttons */}
-      <View style={[
-        styles.buttonContainer,
-        isLargeScreen && styles.buttonContainerLarge,
-        { marginBottom: buttonBottomMargin }
-      ]}>
-        <Button
-          mode="contained"
-          onPress={handlePrevious}
-          disabled={!canGoPrevious}
-          style={styles.button}
-        >
-          Back
-        </Button>
-        <Button
-          mode="contained"
-          onPress={handleNext}
-          disabled={!canGoNext && !isLastPage}
-          style={styles.button}
-        >
-          {isLastPage ? 'Practice' : 'Next'}
-        </Button>
+          {/* Bottom Arrow (Answer Progress) */}
+          {currentStep.bottomArrow !== "" && (
+            <Surface style={styles.bottomArrowSurface}>
+              <Text variant="headlineLarge" style={styles.bottomArrow}>
+                {currentStep.bottomArrow}
+              </Text>
+            </Surface>
+          )}
+
+        </View>
+      </ScrollView>
+
+      {/* Footer with Page Indicator and Navigation Buttons */}
+      <View style={styles.footer}>
+        <Text variant="bodySmall" style={styles.pageIndicator}>
+          Step {currentPage + 1} of 21
+        </Text>
+        <View style={[
+          styles.buttonContainer,
+          isLargeScreen && styles.buttonContainerLarge,
+        ]}>
+          <Button
+            mode="contained"
+            onPress={handlePrevious}
+            disabled={!canGoPrevious}
+            style={styles.button}
+          >
+            Back
+          </Button>
+          <Button
+            mode="contained"
+            onPress={handleNext}
+            disabled={!canGoNext && !isLastPage}
+            style={styles.button}
+          >
+            {isLastPage ? 'Practice' : 'Next'}
+          </Button>
+        </View>
       </View>
     </View>
   );
@@ -123,10 +129,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    padding: SPACING.md,
-    paddingBottom: 100,
   },
-  containerLarge: {
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: SPACING.md,
+    flexGrow: 1,
+  },
+  scrollContentLarge: {
     alignItems: 'center',
   },
   innerContainer: {
@@ -184,21 +195,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.primary,
   },
+  footer: {
+    backgroundColor: COLORS.surface,
+    paddingTop: SPACING.sm,
+  },
   pageIndicator: {
     textAlign: 'center',
-    marginTop: SPACING.sm,
     color: COLORS.disabled,
+    paddingVertical: SPACING.sm,
   },
   buttonContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: SPACING.md,
-    backgroundColor: COLORS.surface,
-    zIndex: 10,
+    paddingTop: 0,
   },
   buttonContainerLarge: {
     justifyContent: 'center',

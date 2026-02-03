@@ -10,16 +10,34 @@ import { useAppStore } from '../../src/store/appStore';
  * 4. Hint state resets properly
  * 5. Integration with answer submission
  *
- * NOTE: These tests need to be updated to match the refactored hint system implementation.
- * The dynamic pattern-based algorithm has different behavior than what these tests expect.
- * TODO: Update test expectations to match actual implementation.
+ * MOVES_COUNT pattern: [0, 1, 4, 9, 15, 21, 27, 33]
+ * - indexCount 0: 1 move  (startMove=0, moveCount=1)
+ * - indexCount 1: 3 moves (startMove=1, moveCount=4)
+ * - indexCount 2: 5 moves (startMove=4, moveCount=9)
+ * - etc.
  */
 
-describe.skip('Hint System Integration', () => {
+describe('Hint System Integration', () => {
   beforeEach(() => {
-    // Reset store to initial state
-    const store = useAppStore.getState();
-    store.resetPractice();
+    // Reset store to initial state (don't use replace=true to keep actions)
+    useAppStore.setState({
+      hintsEnabled: false,
+      hintHelpShown: false,
+      tutorialPage: 0,
+      currentEquation: '',
+      currentAnswer: '',
+      answerProgress: '',
+      indexCount: 0,
+      firstCharRemainder: 0,
+      answerChoices: [],
+      correctAnswerIndex: 0,
+      move: 0,
+      moveCount: 0,
+      remainderHint: 0,
+      hintQuestion: '',
+      hintResult: '',
+      hintHighlightIndices: [],
+    });
   });
 
   describe('Problem Generation and Hint Initialization', () => {
@@ -29,36 +47,35 @@ describe.skip('Hint System Integration', () => {
       // Generate a new problem
       store.generateNewProblem();
 
-      // Verify hint state is initialized
-      expect(store.currentEquation).toBeTruthy();
-      expect(store.move).toBe(0); // First digit starts at move 0
-      expect(store.moveCount).toBe(1); // First digit has 1 move (from MOVES_COUNT[0]=0 to MOVES_COUNT[1]=1)
-      expect(store.remainderHint).toBe(0);
-      expect(store.hintQuestion).toBe('');
-      expect(store.hintResult).toBe('');
-      expect(store.hintHighlightIndices).toEqual([]);
+      // Verify hint state is initialized for first digit (indexCount=0)
+      // MOVES_COUNT[0]=0, MOVES_COUNT[1]=1, so startMove=0, moveCount=1
+      const state = useAppStore.getState();
+      expect(state.currentEquation).toBeTruthy();
+      expect(state.move).toBe(0);
+      expect(state.moveCount).toBe(1);
+      expect(state.remainderHint).toBe(0);
+      expect(state.hintQuestion).toBe('');
+      expect(state.hintResult).toBe('');
+      expect(state.hintHighlightIndices).toEqual([]);
     });
   });
 
   describe('Hint Advancement Flow', () => {
     test('should advance through hints for first digit', () => {
       const store = useAppStore.getState();
-
-      // Enable hints first
       store.setHintsEnabled(true);
-
-      // Generate problem
       store.generateNewProblem();
 
-      const initialMove = store.move;
+      const initialMove = useAppStore.getState().move;
 
       // Advance hint
       store.nextHint();
 
       // Verify hint advanced
-      expect(store.move).toBe(initialMove + 1);
-      expect(store.hintQuestion).toBeTruthy(); // Should have a question
-      expect(store.hintHighlightIndices).toHaveLength(2); // Should highlight 2 digits
+      const state = useAppStore.getState();
+      expect(state.move).toBe(initialMove + 1);
+      expect(state.hintQuestion).toBeTruthy();
+      expect(state.hintHighlightIndices).toHaveLength(2);
     });
 
     test('should not advance beyond moveCount', () => {
@@ -66,31 +83,31 @@ describe.skip('Hint System Integration', () => {
       store.generateNewProblem();
 
       // Set move to moveCount (at limit)
-      useAppStore.setState({ move: store.moveCount });
+      const state = useAppStore.getState();
+      useAppStore.setState({ move: state.moveCount });
 
-      const moveBefore = store.move;
+      const moveBefore = useAppStore.getState().move;
 
       // Try to advance
       store.nextHint();
 
       // Should not advance
-      expect(store.move).toBe(moveBefore);
+      expect(useAppStore.getState().move).toBe(moveBefore);
     });
 
     test('should accumulate hint result display', () => {
       const store = useAppStore.getState();
       store.generateNewProblem();
 
-      // Set up for multiple hints at indexCount=1 (which has 3 moves: [1,4))
-      useAppStore.setState({ indexCount: 1, move: 1, moveCount: 4 });
-
-      const initialResult = store.hintResult;
+      // Set up for multiple hints at indexCount=1 (which has 3 moves: startMove=1, moveCount=4)
+      useAppStore.setState({ indexCount: 1, move: 1, moveCount: 4, hintResult: '' });
 
       // Advance hint
       store.nextHint();
 
       // Result should accumulate
-      expect(store.hintResult.length).toBeGreaterThan(initialResult.length);
+      const state = useAppStore.getState();
+      expect(state.hintResult.length).toBeGreaterThan(0);
     });
   });
 
@@ -108,7 +125,7 @@ describe.skip('Hint System Integration', () => {
       });
 
       // Submit correct answer for first digit
-      const correctIndex = store.correctAnswerIndex;
+      const correctIndex = useAppStore.getState().correctAnswerIndex;
       const result = store.submitAnswer(correctIndex);
 
       // Should be correct but not complete
@@ -116,11 +133,11 @@ describe.skip('Hint System Integration', () => {
       expect(result.isComplete).toBe(false);
 
       // Verify hint state reset for next digit
-      const newStore = useAppStore.getState();
-      expect(newStore.indexCount).toBe(1); // Moved to next digit
-      expect(newStore.hintQuestion).toBe(''); // Reset
-      expect(newStore.remainderHint).toBe(2); // Carry = floor(25/10) = 2
-      expect(newStore.hintResult).toBe('2 + '); // Shows carry
+      const newState = useAppStore.getState();
+      expect(newState.indexCount).toBe(1);
+      expect(newState.hintQuestion).toBe('');
+      expect(newState.remainderHint).toBe(2); // Carry = floor(25/10) = 2
+      expect(newState.hintResult).toBe('2 + ');
     });
 
     test('should not show carry when remainder < 10', () => {
@@ -133,13 +150,13 @@ describe.skip('Hint System Integration', () => {
         remainderHint: 7, // No carry
       });
 
-      const correctIndex = store.correctAnswerIndex;
+      const correctIndex = useAppStore.getState().correctAnswerIndex;
       store.submitAnswer(correctIndex);
 
       // Verify no carry in next digit
-      const newStore = useAppStore.getState();
-      expect(newStore.remainderHint).toBe(0);
-      expect(newStore.hintResult).toBe(''); // No carry display
+      const newState = useAppStore.getState();
+      expect(newState.remainderHint).toBe(0);
+      expect(newState.hintResult).toBe('');
     });
   });
 
@@ -149,15 +166,13 @@ describe.skip('Hint System Integration', () => {
       store.setHintsEnabled(true);
       store.generateNewProblem();
 
-      // Get initial state
-      const initialMove = store.move;
-      const targetMoveCount = store.moveCount;
+      // Get initial state - first digit has 1 move
+      const state = useAppStore.getState();
+      const initialMove = state.move;
+      const targetMoveCount = state.moveCount;
 
-      // If moveCount is 0, we can't advance hints
-      if (targetMoveCount === 0) {
-        expect(store.move).toBe(0);
-        return;
-      }
+      // First digit should have 1 move
+      expect(targetMoveCount).toBe(1);
 
       // Advance through all hints
       for (let i = initialMove; i < targetMoveCount; i++) {
@@ -165,10 +180,10 @@ describe.skip('Hint System Integration', () => {
       }
 
       // Verify we've gone through all hints
-      expect(store.move).toBe(targetMoveCount);
+      expect(useAppStore.getState().move).toBe(targetMoveCount);
 
       // Hint result should have accumulated
-      expect(store.hintResult).toBeTruthy();
+      expect(useAppStore.getState().hintResult).toBeTruthy();
     });
   });
 
@@ -177,31 +192,25 @@ describe.skip('Hint System Integration', () => {
       const store = useAppStore.getState();
       store.generateNewProblem();
 
-      // For indexCount > 0, we should have moves
-      useAppStore.setState({ indexCount: 1 });
+      // Set up for indexCount 1 with proper move range (startMove=1, moveCount=4)
+      useAppStore.setState({ indexCount: 1, move: 1, moveCount: 4, remainderHint: 0 });
 
-      // Generate problem again to get proper move range for indexCount 1
-      store.generateNewProblem();
-      useAppStore.setState({ indexCount: 1, move: 1, moveCount: 3 });
-
-      const initialRemainder = store.remainderHint;
+      const initialRemainder = useAppStore.getState().remainderHint;
 
       // Advance hint
       store.nextHint();
 
-      // Should have updated remainder
-      expect(store.remainderHint).toBeGreaterThanOrEqual(initialRemainder);
+      // Should have updated state
+      const state = useAppStore.getState();
+      expect(state.remainderHint).toBeGreaterThanOrEqual(initialRemainder);
 
       // Should have a valid question (digit × digit)
-      expect(store.hintQuestion).toMatch(/^\d × \d$/);
+      expect(state.hintQuestion).toMatch(/^\d × \d$/);
     });
   });
 
   describe('Hint State Persistence', () => {
-    test('hint state should not persist across sessions', () => {
-      // Note: This test verifies the partialize function in store
-      // Hint state should NOT be in the persistence list
-
+    test('hint state should be non-default after advancing', () => {
       const store = useAppStore.getState();
       store.generateNewProblem();
 
@@ -209,37 +218,26 @@ describe.skip('Hint System Integration', () => {
       store.nextHint();
 
       // Get current hint state
-      const hintState = {
-        move: store.move,
-        moveCount: store.moveCount,
-        remainderHint: store.remainderHint,
-        hintQuestion: store.hintQuestion,
-        hintResult: store.hintResult,
-      };
+      const state = useAppStore.getState();
 
-      // All hint values should be non-default
+      // At least one hint value should be non-default
       expect(
-        hintState.move > 0 ||
-        hintState.hintQuestion !== '' ||
-        hintState.hintResult !== ''
+        state.move > 0 ||
+        state.hintQuestion !== '' ||
+        state.hintResult !== ''
       ).toBe(true);
-
-      // Verify these are not in persistence config by checking partialize
-      // (This is a structural test - actual persistence would require async storage)
     });
   });
 
   describe('Edge Cases', () => {
     test('should handle problem with zeros', () => {
-      // This tests that the hint system works even with digits that multiply to 0
       const store = useAppStore.getState();
-
-      // Set up a problem (we can't control the random generation, but we can test the flow)
       store.generateNewProblem();
 
       // The system should handle any valid problem
-      expect(store.currentEquation).toBeTruthy();
-      expect(store.currentAnswer).toBeTruthy();
+      const state = useAppStore.getState();
+      expect(state.currentEquation).toBeTruthy();
+      expect(state.currentAnswer).toBeTruthy();
     });
 
     test('should handle maximum remainder accumulation', () => {
@@ -250,11 +248,11 @@ describe.skip('Hint System Integration', () => {
       useAppStore.setState({ remainderHint: 99 });
 
       // Should still calculate carry correctly
-      const correctIndex = store.correctAnswerIndex;
+      const correctIndex = useAppStore.getState().correctAnswerIndex;
       store.submitAnswer(correctIndex);
 
-      const newStore = useAppStore.getState();
-      expect(newStore.remainderHint).toBe(9); // floor(99/10) = 9
+      const newState = useAppStore.getState();
+      expect(newState.remainderHint).toBe(9); // floor(99/10) = 9
     });
   });
 
@@ -264,10 +262,10 @@ describe.skip('Hint System Integration', () => {
       store.setHintsEnabled(true);
       store.generateNewProblem();
 
-      // Set move to 9 (threshold for allowing answers)
-      useAppStore.setState({ move: 9 });
+      // Set move to satisfy MIN_HINTS_BEFORE_ANSWER (which is 1)
+      useAppStore.setState({ move: 1 });
 
-      const correctIndex = store.correctAnswerIndex;
+      const correctIndex = useAppStore.getState().correctAnswerIndex;
       const result = store.submitAnswer(correctIndex);
 
       // Should be able to submit
@@ -285,12 +283,13 @@ describe.skip('Hint System Integration', () => {
       store.resetPractice();
 
       // All hint state should be reset
-      expect(store.move).toBe(0);
-      expect(store.moveCount).toBe(0);
-      expect(store.remainderHint).toBe(0);
-      expect(store.hintQuestion).toBe('');
-      expect(store.hintResult).toBe('');
-      expect(store.hintHighlightIndices).toEqual([]);
+      const state = useAppStore.getState();
+      expect(state.move).toBe(0);
+      expect(state.moveCount).toBe(0);
+      expect(state.remainderHint).toBe(0);
+      expect(state.hintQuestion).toBe('');
+      expect(state.hintResult).toBe('');
+      expect(state.hintHighlightIndices).toEqual([]);
     });
 
     test('resetHints should clear hint display state', () => {
@@ -302,9 +301,10 @@ describe.skip('Hint System Integration', () => {
       store.resetHints();
 
       // Hint state should be cleared
-      expect(store.move).toBe(0);
-      expect(store.hintQuestion).toBe('');
-      expect(store.hintResult).toBe('');
+      const state = useAppStore.getState();
+      expect(state.move).toBe(0);
+      expect(state.hintQuestion).toBe('');
+      expect(state.hintResult).toBe('');
     });
   });
 });

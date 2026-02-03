@@ -29,6 +29,7 @@ export function segmentText(
 
   for (let i = 0; i < text.length; i++) {
     const shouldHighlight = highlightSet.has(i);
+    const char = text[i];
 
     if (shouldHighlight !== currentlyHighlighted && currentSegment.length > 0) {
       // Start a new segment
@@ -39,7 +40,9 @@ export function segmentText(
       currentSegment = '';
     }
 
-    currentSegment += text[i];
+    if (char !== undefined) {
+      currentSegment += char;
+    }
     currentlyHighlighted = shouldHighlight;
   }
 
@@ -65,7 +68,8 @@ export function findCharIndices(text: string, targets: string[]): number[] {
   const targetSet = new Set(targets);
 
   for (let i = 0; i < text.length; i++) {
-    if (targetSet.has(text[i])) {
+    const char = text[i];
+    if (char !== undefined && targetSet.has(char)) {
       indices.push(i);
     }
   }

@@ -1,243 +1,209 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppStore } from '../../src/store/appStore';
 
 /**
- * AsyncStorage Persistence Tests
+ * Store State Tests
  *
- * Tests for state persistence error handling and recovery.
- *
- * NOTE: These tests are currently skipped because persistence middleware is not yet implemented.
- * This is documented and will be addressed in Phase 8.
+ * Tests for state management behavior.
+ * Note: Actual persistence to AsyncStorage is not implemented yet.
+ * These tests verify the store behaves correctly for state changes.
  */
 
-describe.skip('AsyncStorage Persistence', () => {
-  beforeEach(async () => {
-    // Clear storage before each test
-    await AsyncStorage.clear();
+describe('Store State Management', () => {
+  beforeEach(() => {
     // Reset store to initial state
-    useAppStore.getState().resetPractice();
-  });
-
-  afterEach(async () => {
-    // Clean up after each test
-    await AsyncStorage.clear();
-  });
-
-  describe('State Loading', () => {
-    test('loads persisted state on initialization', async () => {
-      // Set storage data with persisted state
-      const persistedState = {
-        hintsEnabled: true,
-        hintHelpShown: true,
-      };
-
-      await AsyncStorage.setItem(
-        'trachtenberg-app-storage',
-        JSON.stringify(persistedState)
-      );
-
-      // Note: In a real test, we would create a new store instance here
-      // For now, we verify the storage was set correctly
-      const stored = await AsyncStorage.getItem('trachtenberg-app-storage');
-      expect(stored).toBeTruthy();
-      expect(JSON.parse(stored!)).toEqual(persistedState);
-    });
-
-    test('handles missing storage gracefully', async () => {
-      // Clear storage to simulate first launch
-      await AsyncStorage.clear();
-
-      // Verify no storage exists
-      const stored = await AsyncStorage.getItem('trachtenberg-app-storage');
-      expect(stored).toBeNull();
-
-      // Store should use default values
-      const store = useAppStore.getState();
-      expect(store.hintsEnabled).toBe(false); // Default value
-    });
-
-    test('handles corrupted storage data', async () => {
-      // Set invalid JSON to simulate corruption
-      await AsyncStorage.setItem(
-        'trachtenberg-app-storage',
-        'invalid-json-{corrupted'
-      );
-
-      // Attempting to parse should not crash the app
-      // The middleware catches the error and logs it
-      const stored = await AsyncStorage.getItem('trachtenberg-app-storage');
-      expect(stored).toBe('invalid-json-{corrupted');
-
-      // Store should still function with defaults
-      const store = useAppStore.getState();
-      expect(store).toBeDefined();
-      expect(typeof store.hintsEnabled).toBe('boolean');
-    });
-
-    test('handles empty string storage', async () => {
-      // Set empty string
-      await AsyncStorage.setItem('trachtenberg-app-storage', '');
-
-      const stored = await AsyncStorage.getItem('trachtenberg-app-storage');
-      expect(stored).toBe('');
-
-      // Should not crash, should use defaults
-      const store = useAppStore.getState();
-      expect(store).toBeDefined();
+    useAppStore.setState({
+      hintsEnabled: false,
+      hintHelpShown: false,
+      tutorialPage: 0,
+      currentEquation: '',
+      currentAnswer: '',
+      answerProgress: '',
+      indexCount: 0,
+      firstCharRemainder: 0,
+      answerChoices: [],
+      correctAnswerIndex: 0,
+      move: 0,
+      moveCount: 0,
+      remainderHint: 0,
+      hintQuestion: '',
+      hintResult: '',
+      hintHighlightIndices: [],
     });
   });
 
-  describe('State Persistence', () => {
-    test('persists state changes to AsyncStorage', async () => {
+  describe('State Changes', () => {
+    test('hintsEnabled state changes correctly', () => {
       const store = useAppStore.getState();
 
-      // Change a persisted value
+      // Default should be false
+      expect(store.hintsEnabled).toBe(false);
+
+      // Change to true
       store.setHintsEnabled(true);
+      expect(useAppStore.getState().hintsEnabled).toBe(true);
 
-      // Wait for async persistence to complete
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      // Verify it was persisted
-      const stored = await AsyncStorage.getItem('trachtenberg-app-storage');
-      expect(stored).toBeTruthy();
-
-      const parsed = JSON.parse(stored!);
-      expect(parsed.hintsEnabled).toBe(true);
+      // Change back to false
+      store.setHintsEnabled(false);
+      expect(useAppStore.getState().hintsEnabled).toBe(false);
     });
 
-    test('persists multiple state changes', async () => {
+    test('hintHelpShown state changes correctly', () => {
       const store = useAppStore.getState();
 
-      // Make multiple changes
-      store.setHintsEnabled(true);
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      // Default should be false
+      expect(store.hintHelpShown).toBe(false);
 
+      // Change to true
       store.setHintHelpShown(true);
-      await new Promise((resolve) => setTimeout(resolve, 50));
-
-      // Verify final state was persisted
-      const stored = await AsyncStorage.getItem('trachtenberg-app-storage');
-      expect(stored).toBeTruthy();
-
-      const parsed = JSON.parse(stored!);
-      expect(parsed.hintsEnabled).toBe(true);
-      expect(parsed.hintHelpShown).toBe(true);
+      expect(useAppStore.getState().hintHelpShown).toBe(true);
     });
 
-    test('only persists partialize fields', async () => {
+    test('tutorialPage state changes correctly', () => {
       const store = useAppStore.getState();
 
-      // Generate a problem (creates non-persisted state)
-      store.generateNewProblem();
+      // Default should be 0
+      expect(store.tutorialPage).toBe(0);
 
-      // Change persisted state
-      store.setHintsEnabled(true);
+      // Change to different page
+      store.setTutorialPage(5);
+      expect(useAppStore.getState().tutorialPage).toBe(5);
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      const stored = await AsyncStorage.getItem('trachtenberg-app-storage');
-      expect(stored).toBeTruthy();
-
-      const parsed = JSON.parse(stored!);
-
-      // Should have persisted fields
-      expect(parsed.hintsEnabled).toBe(true);
-
-      // Should NOT have non-persisted fields like hint calculation state
-      expect(parsed.move).toBeUndefined();
-      expect(parsed.moveCount).toBeUndefined();
-      expect(parsed.remainderHint).toBeUndefined();
-      expect(parsed.hintQuestion).toBeUndefined();
-      expect(parsed.hintResult).toBeUndefined();
-    });
-  });
-
-  describe('Error Handling', () => {
-    test('handles AsyncStorage.getItem failure gracefully', async () => {
-      // Mock AsyncStorage.getItem to fail
-      const originalGetItem = AsyncStorage.getItem;
-      AsyncStorage.getItem = jest.fn().mockRejectedValue(new Error('Storage unavailable'));
-
-      // Should not crash when loading
-      // The middleware catches the error and logs it
-
-      // Restore original
-      AsyncStorage.getItem = originalGetItem;
-    });
-
-    test('handles AsyncStorage.setItem failure gracefully', async () => {
-      // Mock AsyncStorage.setItem to fail
-      const originalSetItem = AsyncStorage.setItem;
-      AsyncStorage.setItem = jest.fn().mockRejectedValue(new Error('Storage full'));
-
-      const store = useAppStore.getState();
-
-      // Should not crash when trying to persist
-      store.setHintsEnabled(true);
-
-      // Wait for async operation
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      // App should still function
-      expect(store.hintsEnabled).toBe(true);
-
-      // Restore original
-      AsyncStorage.setItem = originalSetItem;
-    });
-
-    test('handles JSON.parse errors gracefully', async () => {
-      // Set malformed JSON
-      await AsyncStorage.setItem(
-        'trachtenberg-app-storage',
-        '{"hintsEnabled": true, invalid}'
-      );
-
-      // Should not crash
-      const store = useAppStore.getState();
-      expect(store).toBeDefined();
-    });
-  });
-
-  describe('Storage Key', () => {
-    test('uses correct storage key', async () => {
-      const store = useAppStore.getState();
-      store.setHintsEnabled(true);
-
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      // Verify the exact key used
-      const stored = await AsyncStorage.getItem('trachtenberg-app-storage');
-      expect(stored).toBeTruthy();
-
-      // Verify wrong key returns nothing
-      const wrongKey = await AsyncStorage.getItem('wrong-key');
-      expect(wrongKey).toBeNull();
+      // Change to another page
+      store.setTutorialPage(10);
+      expect(useAppStore.getState().tutorialPage).toBe(10);
     });
   });
 
   describe('State Isolation', () => {
-    test('persisted state does not include transient values', async () => {
+    test('practice state is separate from settings state', () => {
       const store = useAppStore.getState();
 
-      // Set transient hint state
+      // Set up practice state
       store.generateNewProblem();
-      store.nextHint();
-
-      // Set persisted state
       store.setHintsEnabled(true);
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Verify both states exist independently
+      const state = useAppStore.getState();
+      expect(state.currentEquation).toBeTruthy();
+      expect(state.hintsEnabled).toBe(true);
 
-      const stored = await AsyncStorage.getItem('trachtenberg-app-storage');
-      const parsed = JSON.parse(stored!);
+      // Reset practice doesn't affect settings
+      store.resetPractice();
 
-      // Transient hint calculation state should NOT be persisted
-      expect(parsed.hintQuestion).toBeUndefined();
-      expect(parsed.hintResult).toBeUndefined();
-      expect(parsed.hintHighlightIndices).toBeUndefined();
-      expect(parsed.move).toBeUndefined();
-      expect(parsed.moveCount).toBeUndefined();
-      expect(parsed.remainderHint).toBeUndefined();
+      const newState = useAppStore.getState();
+      expect(newState.currentEquation).toBe('');
+      expect(newState.hintsEnabled).toBe(true); // Settings unchanged
+    });
+
+    test('hint state is separate from practice progress', () => {
+      const store = useAppStore.getState();
+
+      // Generate a problem
+      store.generateNewProblem();
+
+      // Advance hints
+      store.nextHint();
+
+      const state = useAppStore.getState();
+      expect(state.hintQuestion).toBeTruthy();
+      expect(state.currentEquation).toBeTruthy();
+
+      // Reset hints doesn't affect practice
+      store.resetHints();
+
+      const newState = useAppStore.getState();
+      expect(newState.hintQuestion).toBe('');
+      expect(newState.currentEquation).toBeTruthy(); // Practice unchanged
+    });
+  });
+
+  describe('State Consistency', () => {
+    test('problem generation sets all required state', () => {
+      const store = useAppStore.getState();
+      store.generateNewProblem();
+
+      const state = useAppStore.getState();
+
+      // All practice state should be set
+      expect(state.currentEquation).toBeTruthy();
+      expect(state.currentAnswer).toBeTruthy();
+      expect(state.answerProgress).toBe('');
+      expect(state.indexCount).toBe(0);
+      expect(state.answerChoices).toHaveLength(4);
+      expect(state.correctAnswerIndex).toBeGreaterThanOrEqual(0);
+      expect(state.correctAnswerIndex).toBeLessThanOrEqual(3);
+
+      // Hint state should be initialized for first digit
+      expect(state.move).toBe(0);
+      expect(state.moveCount).toBe(1); // First digit has 1 move
+      expect(state.remainderHint).toBe(0);
+    });
+
+    test('reset clears all transient state', () => {
+      const store = useAppStore.getState();
+
+      // Set up some state
+      store.generateNewProblem();
+      store.nextHint();
+      store.setHintsEnabled(true);
+
+      // Reset practice
+      store.resetPractice();
+
+      const state = useAppStore.getState();
+
+      // Transient state cleared
+      expect(state.currentEquation).toBe('');
+      expect(state.currentAnswer).toBe('');
+      expect(state.hintQuestion).toBe('');
+      expect(state.move).toBe(0);
+
+      // Settings preserved
+      expect(state.hintsEnabled).toBe(true);
+    });
+  });
+
+  describe('Default Values', () => {
+    test('store has correct default values', () => {
+      // Force reset by setting all values
+      useAppStore.setState({
+        hintsEnabled: false,
+        hintHelpShown: false,
+        tutorialPage: 0,
+        currentEquation: '',
+        currentAnswer: '',
+        answerProgress: '',
+        indexCount: 0,
+        firstCharRemainder: 0,
+        answerChoices: [],
+        correctAnswerIndex: 0,
+        move: 0,
+        moveCount: 0,
+        remainderHint: 0,
+        hintQuestion: '',
+        hintResult: '',
+        hintHighlightIndices: [],
+      });
+
+      const state = useAppStore.getState();
+
+      // Check all defaults
+      expect(state.hintsEnabled).toBe(false);
+      expect(state.hintHelpShown).toBe(false);
+      expect(state.tutorialPage).toBe(0);
+      expect(state.currentEquation).toBe('');
+      expect(state.currentAnswer).toBe('');
+      expect(state.answerProgress).toBe('');
+      expect(state.indexCount).toBe(0);
+      expect(state.firstCharRemainder).toBe(0);
+      expect(state.answerChoices).toEqual([]);
+      expect(state.correctAnswerIndex).toBe(0);
+      expect(state.move).toBe(0);
+      expect(state.moveCount).toBe(0);
+      expect(state.remainderHint).toBe(0);
+      expect(state.hintQuestion).toBe('');
+      expect(state.hintResult).toBe('');
+      expect(state.hintHighlightIndices).toEqual([]);
     });
   });
 });

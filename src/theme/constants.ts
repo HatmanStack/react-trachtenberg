@@ -25,5 +25,4 @@ export const FONT_SIZES = {
   xlarge: 24,
 };
 
-export const TUTORIAL_STEPS_COUNT = 17;
 export const MAX_DIGIT_COUNT = 7; // Max answer length

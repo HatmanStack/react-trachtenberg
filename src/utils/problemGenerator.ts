@@ -3,6 +3,13 @@
  * Ported from Android PracticeActivity.operatorEquation()
  */
 
+import {
+  FIRST_NUMBER_MIN,
+  FIRST_NUMBER_MAX,
+  SECOND_NUMBER_MIN,
+  SECOND_NUMBER_MAX,
+} from '../constants/algorithm';
+
 export interface PracticeProblem {
   firstNumber: number;  // 4-digit number (1000-9999)
   secondNumber: number; // 3-digit number (100-999)
@@ -22,14 +29,14 @@ export interface PracticeProblem {
  * that bug by correctly regenerating both numbers in their proper ranges.
  */
 export function generateProblem(): PracticeProblem {
-  let firstNumber = Math.floor(Math.random() * 10000);
-  let secondNumber = Math.floor(Math.random() * 1000);
+  let firstNumber = Math.floor(Math.random() * FIRST_NUMBER_MAX);
+  let secondNumber = Math.floor(Math.random() * SECOND_NUMBER_MAX);
 
   // Ensure minimum digit counts
   // Android bug fixed: now correctly regenerates both numbers in proper ranges
-  while (firstNumber < 1000 || secondNumber < 100) {
-    firstNumber = Math.floor(Math.random() * 10000);  // Correct: 4-digit range
-    secondNumber = Math.floor(Math.random() * 1000);   // Correct: 3-digit range
+  while (firstNumber < FIRST_NUMBER_MIN || secondNumber < SECOND_NUMBER_MIN) {
+    firstNumber = Math.floor(Math.random() * FIRST_NUMBER_MAX);
+    secondNumber = Math.floor(Math.random() * SECOND_NUMBER_MAX);
   }
 
   const answer = firstNumber * secondNumber;
@@ -69,6 +76,10 @@ export function formatEquationWithPadding(
   const parts = equation.split(' × ');
   const firstStr = parts[0];
   const secondStr = parts[1];
+
+  if (firstStr === undefined || secondStr === undefined) {
+    return equation;
+  }
 
   // Calculate padding needed: for indexCount N, if we need to access position N
   // and firstStr has length L, we need (N - L + 1) leading zeros

@@ -25,6 +25,9 @@ export function getTutorialHighlightIndices(answerText: string): number[] {
     }
 
     const afterOf = parts[1];
+    if (afterOf === undefined) {
+      return [];
+    }
 
     // Get first character after " of " (the first digit)
     if (afterOf.length < 1) {

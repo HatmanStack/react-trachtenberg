@@ -3,13 +3,17 @@
  * Ported from Android PracticeActivity.buttonQuestion()
  */
 
+import { logger } from './logger';
+
+const MAX_ITERATIONS = 100;
+
 /**
  * Generates four answer choices for a multiple choice quiz
  * @param correctDigit - The correct digit (0-9)
- * @returns Object with choices array and correctIndex
+ * @returns Object with choices tuple and correctIndex
  */
 export function generateAnswerChoices(correctDigit: number): {
-  choices: number[];
+  choices: readonly [number, number, number, number];
   correctIndex: number;
 } {
   // Random position for correct answer (0-3)
@@ -23,16 +27,29 @@ export function generateAnswerChoices(correctDigit: number): {
     if (i === correctIndex) continue;
 
     let incorrectDigit = Math.floor(Math.random() * 10);
+    let iterations = 0;
 
     // Ensure uniqueness - no duplicates allowed
-    while (choices.includes(incorrectDigit)) {
+    while (choices.includes(incorrectDigit) && iterations < MAX_ITERATIONS) {
       incorrectDigit = Math.floor(Math.random() * 10);
+      iterations++;
+    }
+
+    // Fallback: find first unused digit if max iterations reached
+    if (choices.includes(incorrectDigit)) {
+      logger.warn('generateAnswerChoices: max iterations reached, using fallback');
+      for (let digit = 0; digit <= 9; digit++) {
+        if (!choices.includes(digit)) {
+          incorrectDigit = digit;
+          break;
+        }
+      }
     }
 
     choices[i] = incorrectDigit;
   }
 
-  return { choices, correctIndex };
+  return { choices: choices as [number, number, number, number], correctIndex };
 }
 
 /**
@@ -48,7 +65,10 @@ export function getDigitAtPosition(number: number, position: number): number {
 
   if (index < 0) return 0;
 
-  return parseInt(str[index], 10);
+  const char = str[index];
+  if (char === undefined) return 0;
+
+  return parseInt(char, 10);
 }
 
 /**
@@ -61,7 +81,10 @@ export function getDigitsArray(number: number): number[] {
   const digits: number[] = [];
 
   for (let i = str.length - 1; i >= 0; i--) {
-    digits.push(parseInt(str[i], 10));
+    const char = str[i];
+    if (char !== undefined) {
+      digits.push(parseInt(char, 10));
+    }
   }
 
   return digits;
