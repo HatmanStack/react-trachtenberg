@@ -4,7 +4,7 @@
 User-agent: *
 Allow: /
 Allow: /practice
-Disallow: /settings
+Allow: /settings
 
 # Sitemap location
 Sitemap: https://trachtenberg.hatstack.fun/sitemap.xml
