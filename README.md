@@ -42,7 +42,7 @@ A cross-platform mobile and web application to teach the [Trachtenberg method](h
 
 ### Prerequisites
 
-* [Node.js](https://nodejs.org/) v18.x or higher
+* [Node.js](https://nodejs.org/) v24
 * [npm](https://www.npmjs.com/) or [Yarn](https://classic.yarnpkg.com/en/docs/install)
 * [Expo Go](https://expo.dev/go) app on your iOS or Android device (for development)
 
@@ -86,8 +86,33 @@ npm test
 
 # Run tests in watch mode
 npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Lint the codebase
+npm run lint
+
+# Lint and auto-fix
+npm run lint:fix
 ```
 
+## Project Structure
+
+```
+app/              # Expo Router file-based routing (screens as routes)
+src/
+  screens/        # Screen components (LearnScreen, PracticeScreen, SettingsScreen)
+  store/          # Zustand state management (appStore.ts)
+  utils/          # Pure utility functions (Trachtenberg algorithm, validation, hints)
+  components/     # Reusable UI components (AnswerButton, HintDisplay, etc.)
+  data/           # Tutorial content and step definitions
+  constants/      # Algorithm and timing constants
+  hooks/          # Custom React hooks
+  theme/          # Colors, spacing, React Native Paper theme
+  types/          # TypeScript interfaces
+__tests__/        # Jest tests mirroring src/ structure
+```
 
 ## 📜 License
 
