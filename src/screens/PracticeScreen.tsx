@@ -46,6 +46,9 @@ export default function PracticeScreen() {
     return formatEquationWithPadding(currentEquation, indexCount, hintsEnabled);
   }, [currentEquation, indexCount, hintsEnabled]);
 
+  // Track which equation has already had hints initialized
+  const hintInitRef = useRef<string | null>(null);
+
   // Animated values for feedback and hint display
   const feedbackOpacity = useRef(new Animated.Value(0)).current;
   const hintOpacity = useRef(new Animated.Value(0)).current;
@@ -91,18 +94,21 @@ export default function PracticeScreen() {
     }
   }, [currentEquation, generateNewProblem]);
 
+  // Track which equation has already had hints initialized
+  const hintInitRef = useRef<string | null>(null);
+
   // Show hints when problem loads and hints are enabled
   useEffect(() => {
     if (currentEquation && hintsEnabled) {
+      if (hintInitRef.current === currentEquation) return;
+      hintInitRef.current = currentEquation;
       logger.debug('useEffect: Showing hints for equation:', currentEquation);
       showHints();
       // Call nextHint to show the first hint step
-      if (move === 0 && hintQuestion === '') {
-        logger.debug('useEffect: Initializing first hint');
-        nextHint();
-      }
+      logger.debug('useEffect: Initializing first hint');
+      nextHint();
     }
-  }, [currentEquation, hintsEnabled, showHints, move, hintQuestion, nextHint]);
+  }, [currentEquation, hintsEnabled, showHints, nextHint]);
 
   const handleHintPress = useCallback(() => {
     logger.debug('handleHintPress - move:', move, 'moveCount:', moveCount, 'can advance:', move < moveCount);
