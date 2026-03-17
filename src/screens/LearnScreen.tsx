@@ -23,8 +23,6 @@ export default function LearnScreen() {
     canGoPrevious,
   } = useTutorialNavigation();
 
-  logger.debug('LearnScreen render, currentPage:', currentPage);
-
   const currentStep = tutorialSteps[currentPage];
   if (!currentStep) {
     return null;

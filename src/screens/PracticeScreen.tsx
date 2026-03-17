@@ -46,11 +46,6 @@ export default function PracticeScreen() {
     return formatEquationWithPadding(currentEquation, indexCount, hintsEnabled);
   }, [currentEquation, indexCount, hintsEnabled]);
 
-  // Debug: Log hint state on render
-  logger.debug('PracticeScreen render - move:', move, 'moveCount:', moveCount, 'hintsEnabled:', hintsEnabled);
-  logger.debug('PracticeScreen render - hintQuestion:', hintQuestion, 'hintResult:', hintResult);
-  logger.debug('PracticeScreen render - answerChoices:', answerChoices, 'indexCount:', indexCount, 'answerProgress:', answerProgress);
-
   // Animated values for feedback and hint display
   const feedbackOpacity = useRef(new Animated.Value(0)).current;
   const hintOpacity = useRef(new Animated.Value(0)).current;
