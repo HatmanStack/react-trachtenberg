@@ -256,18 +256,16 @@ describe('Hint System Integration', () => {
   });
 
   describe('Hint Enforcement Integration', () => {
-    test('should allow answer after viewing sufficient hints', () => {
+    test('store submitAnswer succeeds regardless of hint state (enforcement is in UI)', () => {
       const store = useAppStore.getState();
       store.setHintsEnabled(true);
       store.generateNewProblem();
 
-      // Set move to satisfy MIN_HINTS_BEFORE_ANSWER (which is 1)
-      useAppStore.setState({ move: 1 });
-
+      // move is 0, below MIN_HINTS_BEFORE_ANSWER — store has no gate
       const correctIndex = useAppStore.getState().correctAnswerIndex;
       const result = store.submitAnswer(correctIndex);
 
-      // Should be able to submit
+      // Store allows the answer; UI-level enforcement is in PracticeScreen.handleAnswerPress
       expect(result.isCorrect).toBe(true);
     });
   });

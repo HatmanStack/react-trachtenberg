@@ -80,6 +80,10 @@ export default function PracticeScreen() {
     hintOpacity.setValue(0);
   }, [hintOpacity]);
 
+  // Clean up pending timeout on unmount
+  const cleanup = useAppStore((state) => state.cleanup);
+  useEffect(() => () => { cleanup(); }, [cleanup]);
+
   // Generate first problem on mount
   useEffect(() => {
     logger.debug('PracticeScreen mounted, currentEquation:', currentEquation);
@@ -103,6 +107,9 @@ export default function PracticeScreen() {
       // Call nextHint to show the first hint step
       logger.debug('useEffect: Initializing first hint');
       nextHint();
+    } else if (!hintsEnabled) {
+      // Reset ref when hints are disabled so re-enabling triggers initialization
+      hintInitRef.current = null;
     }
   }, [currentEquation, hintsEnabled, showHints, nextHint]);
 

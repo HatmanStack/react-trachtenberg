@@ -79,11 +79,6 @@ describe('answerValidator', () => {
       expect(result.isComplete).toBe(true);
     });
 
-    test('returns zero remainder for incorrect answers', () => {
-      const result = validateAnswer(0, 1, '12345', 2);
-      expect(result.newRemainder).toBe(0);
-    });
-
     test('handles zero as first digit correctly', () => {
       const result = validateAnswer(0, 0, '10203', 0);
       expect(result.isCorrect).toBe(true);

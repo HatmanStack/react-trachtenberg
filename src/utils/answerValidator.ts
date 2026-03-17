@@ -8,7 +8,6 @@ export interface ValidationResult {
   isComplete: boolean;
   newIndexCount: number;
   newAnswerProgress: string;
-  newRemainder: number;
 }
 
 /**
@@ -38,7 +37,6 @@ export function validateAnswer(
       newAnswerProgress: currentAnswer.substring(
         currentAnswer.length - indexCount
       ),
-      newRemainder: 0,
     };
   }
 
@@ -56,6 +54,5 @@ export function validateAnswer(
     isComplete,
     newIndexCount,
     newAnswerProgress,
-    newRemainder: 0,
   };
 }

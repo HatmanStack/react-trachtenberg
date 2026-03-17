@@ -68,14 +68,19 @@ describe('[AppStore]', () => {
 
     it('should set remainderHint to 0 when carry digit is 0', () => {
       const store = useAppStore.getState();
-      store.generateNewProblem();
+
+      // Ensure multi-digit answer
+      let attempts = 0;
+      do {
+        store.generateNewProblem();
+        attempts++;
+      } while (useAppStore.getState().currentAnswer.length <= 1 && attempts < 20);
+      expect(useAppStore.getState().currentAnswer.length).toBeGreaterThan(1);
 
       // Set remainderHint to a value < 10 so carry = 0
       useAppStore.setState({ remainderHint: 5 });
 
-      const { correctAnswerIndex, currentAnswer } = useAppStore.getState();
-
-      if (currentAnswer.length <= 1) return;
+      const { correctAnswerIndex } = useAppStore.getState();
 
       const result = store.submitAnswer(correctAnswerIndex);
       expect(result.isCorrect).toBe(true);
@@ -89,14 +94,19 @@ describe('[AppStore]', () => {
 
     it('should propagate non-zero carry when remainderHint >= 10', () => {
       const store = useAppStore.getState();
-      store.generateNewProblem();
+
+      // Ensure multi-digit answer
+      let attempts = 0;
+      do {
+        store.generateNewProblem();
+        attempts++;
+      } while (useAppStore.getState().currentAnswer.length <= 1 && attempts < 20);
+      expect(useAppStore.getState().currentAnswer.length).toBeGreaterThan(1);
 
       // Set remainderHint to 25 so carry = 2
       useAppStore.setState({ remainderHint: 25 });
 
-      const { correctAnswerIndex, currentAnswer } = useAppStore.getState();
-
-      if (currentAnswer.length <= 1) return;
+      const { correctAnswerIndex } = useAppStore.getState();
 
       const result = store.submitAnswer(correctAnswerIndex);
       expect(result.isCorrect).toBe(true);
