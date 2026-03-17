@@ -69,7 +69,7 @@ export function getMoveRange(indexCount: number): MoveRange {
  * Determines which digit indices to multiply for a given move
  * Dynamically calculates based on indexCount and local move position
  *
- * @param move - Current move number (0-23)
+ * @param move - Current move number (0-32)
  * @param indexCount - Current digit position being calculated (0-6, right to left)
  * @returns Indices in the first and second strings to multiply
  */

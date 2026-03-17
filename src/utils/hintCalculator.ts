@@ -35,8 +35,8 @@ export interface HintStepResult {
  * Calculates a single hint step for Trachtenberg multiplication
  * Ports Android's practiceHint() logic (lines 219-267)
  *
- * @param equation - The current equation string (e.g., "1234 * 567")
- * @param move - Current move number (0-23)
+ * @param equation - The current equation string (e.g., "1234 × 567")
+ * @param move - Current move number (0-32)
  * @param currentRemainder - Accumulated remainder from previous steps
  * @param indexCount - Current digit position being calculated (0-6, right to left)
  * @returns Hint step information
