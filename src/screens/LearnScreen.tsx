@@ -21,6 +21,7 @@ export default function LearnScreen() {
     isLastPage,
     canGoNext,
     canGoPrevious,
+    totalPages,
   } = useTutorialNavigation();
 
   const currentStep = tutorialSteps[currentPage];
@@ -95,7 +96,7 @@ export default function LearnScreen() {
       {/* Footer with Page Indicator and Navigation Buttons */}
       <View style={styles.footer}>
         <Text variant="bodySmall" style={styles.pageIndicator}>
-          Step {currentPage + 1} of 21
+          Step {currentPage + 1} of {totalPages}
         </Text>
         <View style={[
           styles.buttonContainer,
