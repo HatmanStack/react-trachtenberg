@@ -1,11 +1,8 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Dimensions } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { List, Switch, Divider } from 'react-native-paper';
 import { useAppStore } from '../store/appStore';
 import { COLORS, SPACING } from '../theme/constants';
-
-const { width } = Dimensions.get('window');
-const isLargeScreen = width > 768;
 
 /**
  * Settings Screen
@@ -15,6 +12,9 @@ const isLargeScreen = width > 768;
  */
 
 export default function SettingsScreen() {
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width > 768;
+
   const hintsEnabled = useAppStore((state) => state.hintsEnabled);
   const setHintsEnabled = useAppStore((state) => state.setHintsEnabled);
 
@@ -25,23 +25,22 @@ export default function SettingsScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={isLargeScreen && styles.contentLarge}>
       <View style={isLargeScreen ? styles.innerContainer : undefined}>
-      <List.Section>
-        <List.Subheader>Practice Settings</List.Subheader>
-        <List.Item
-          title="Show Hints"
-          description="Display step-by-step calculation hints during practice"
-          left={(props) => <List.Icon {...props} icon="lightbulb-outline" />}
-          right={() => (
-            <Switch
-              value={hintsEnabled}
-              onValueChange={handleHintToggle}
-            />
-          )}
-        />
-        <Divider />
-      </List.Section>
+        <List.Section>
+          <List.Subheader>Practice Settings</List.Subheader>
+          <List.Item
+            title="Show Hints"
+            description="Display step-by-step calculation hints during practice"
+            left={(props) => <List.Icon {...props} icon="lightbulb-outline" />}
+            right={() => (
+              <Switch
+                value={hintsEnabled}
+                onValueChange={handleHintToggle}
+              />
+            )}
+          />
+          <Divider />
+        </List.Section>
 
-        {/* Future settings can be added here */}
         <List.Section style={styles.section}>
           <List.Subheader>About</List.Subheader>
           <List.Item

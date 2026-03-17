@@ -3,12 +3,9 @@
  * Ported from Android PracticeActivity.buttonQuestion()
  */
 
-import { logger } from './logger';
-
-const MAX_ITERATIONS = 100;
-
 /**
  * Generates four answer choices for a multiple choice quiz
+ * Uses Fisher-Yates selection to guarantee unique choices in O(1)
  * @param correctDigit - The correct digit (0-9)
  * @returns Object with choices tuple and correctIndex
  */
@@ -16,37 +13,35 @@ export function generateAnswerChoices(correctDigit: number): {
   choices: readonly [number, number, number, number];
   correctIndex: number;
 } {
+  if (!Number.isInteger(correctDigit) || correctDigit < 0 || correctDigit > 9) {
+    throw new Error(
+      `correctDigit must be an integer between 0 and 9, got: ${correctDigit}`
+    );
+  }
+
   // Random position for correct answer (0-3)
   const correctIndex = Math.floor(Math.random() * 4);
 
+  // Build pool of digits 0-9 excluding the correct digit
+  const pool = Array.from({ length: 10 }, (_, i) => i).filter(
+    (d) => d !== correctDigit
+  );
+
+  // Fisher-Yates partial shuffle: select 3 unique elements from pool
+  for (let i = pool.length - 1; i > pool.length - 4; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j]!, pool[i]!];
+  }
+  const selected = pool.slice(pool.length - 3);
+
+  // Place correct digit at correctIndex, fill rest with selected
   const choices: number[] = new Array(4).fill(-1);
   choices[correctIndex] = correctDigit;
-
-  // Fill remaining positions with unique incorrect digits
+  let selectedIdx = 0;
   for (let i = 0; i < 4; i++) {
     if (i === correctIndex) continue;
-
-    let incorrectDigit = Math.floor(Math.random() * 10);
-    let iterations = 0;
-
-    // Ensure uniqueness - no duplicates allowed
-    while (choices.includes(incorrectDigit) && iterations < MAX_ITERATIONS) {
-      incorrectDigit = Math.floor(Math.random() * 10);
-      iterations++;
-    }
-
-    // Fallback: find first unused digit if max iterations reached
-    if (choices.includes(incorrectDigit)) {
-      logger.warn('generateAnswerChoices: max iterations reached, using fallback');
-      for (let digit = 0; digit <= 9; digit++) {
-        if (!choices.includes(digit)) {
-          incorrectDigit = digit;
-          break;
-        }
-      }
-    }
-
-    choices[i] = incorrectDigit;
+    choices[i] = selected[selectedIdx]!;
+    selectedIdx++;
   }
 
   return { choices: choices as [number, number, number, number], correctIndex };
@@ -69,23 +64,4 @@ export function getDigitAtPosition(number: number, position: number): number {
   if (char === undefined) return 0;
 
   return parseInt(char, 10);
-}
-
-/**
- * Extracts all digits from a number as an array (right-to-left)
- * @param number - The number to extract from
- * @returns Array of digits from right to left
- */
-export function getDigitsArray(number: number): number[] {
-  const str = Math.abs(number).toString();
-  const digits: number[] = [];
-
-  for (let i = str.length - 1; i >= 0; i--) {
-    const char = str[i];
-    if (char !== undefined) {
-      digits.push(parseInt(char, 10));
-    }
-  }
-
-  return digits;
 }

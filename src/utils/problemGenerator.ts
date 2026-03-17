@@ -9,12 +9,7 @@ import {
   SECOND_NUMBER_MIN,
   SECOND_NUMBER_MAX,
 } from '../constants/algorithm';
-
-export interface PracticeProblem {
-  firstNumber: number;  // 4-digit number (1000-9999)
-  secondNumber: number; // 3-digit number (100-999)
-  answer: number;       // firstNumber * secondNumber
-}
+import { PracticeProblem } from '../types';
 
 /**
  * Generates a random multiplication problem
@@ -29,15 +24,9 @@ export interface PracticeProblem {
  * that bug by correctly regenerating both numbers in their proper ranges.
  */
 export function generateProblem(): PracticeProblem {
-  let firstNumber = Math.floor(Math.random() * FIRST_NUMBER_MAX);
-  let secondNumber = Math.floor(Math.random() * SECOND_NUMBER_MAX);
-
-  // Ensure minimum digit counts
-  // Android bug fixed: now correctly regenerates both numbers in proper ranges
-  while (firstNumber < FIRST_NUMBER_MIN || secondNumber < SECOND_NUMBER_MIN) {
-    firstNumber = Math.floor(Math.random() * FIRST_NUMBER_MAX);
-    secondNumber = Math.floor(Math.random() * SECOND_NUMBER_MAX);
-  }
+  // Direct range generation: FIRST_NUMBER_MIN..FIRST_NUMBER_MAX-1, SECOND_NUMBER_MIN..SECOND_NUMBER_MAX-1
+  const firstNumber = FIRST_NUMBER_MIN + Math.floor(Math.random() * (FIRST_NUMBER_MAX - FIRST_NUMBER_MIN));
+  const secondNumber = SECOND_NUMBER_MIN + Math.floor(Math.random() * (SECOND_NUMBER_MAX - SECOND_NUMBER_MIN));
 
   const answer = firstNumber * secondNumber;
 
@@ -99,10 +88,10 @@ export function formatEquationWithPadding(
  */
 export function isValidProblem(problem: PracticeProblem): boolean {
   return (
-    problem.firstNumber >= 1000 &&
-    problem.firstNumber < 10000 &&
-    problem.secondNumber >= 100 &&
-    problem.secondNumber < 1000 &&
+    problem.firstNumber >= FIRST_NUMBER_MIN &&
+    problem.firstNumber < FIRST_NUMBER_MAX &&
+    problem.secondNumber >= SECOND_NUMBER_MIN &&
+    problem.secondNumber < SECOND_NUMBER_MAX &&
     problem.answer === problem.firstNumber * problem.secondNumber
   );
 }

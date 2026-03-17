@@ -1,4 +1,4 @@
-import { generateAnswerChoices, getDigitAtPosition, getDigitsArray } from '../../src/utils/answerChoices';
+import { generateAnswerChoices, getDigitAtPosition } from '../../src/utils/answerChoices';
 
 describe('answerChoices', () => {
   describe('generateAnswerChoices', () => {
@@ -109,28 +109,6 @@ describe('answerChoices', () => {
     test('handles zero', () => {
       expect(getDigitAtPosition(0, 0)).toBe(0);
       expect(getDigitAtPosition(0, 1)).toBe(0);
-    });
-  });
-
-  describe('getDigitsArray', () => {
-    test('extracts all digits in reverse order', () => {
-      expect(getDigitsArray(12345)).toEqual([5, 4, 3, 2, 1]);
-    });
-
-    test('handles single-digit numbers', () => {
-      expect(getDigitsArray(7)).toEqual([7]);
-    });
-
-    test('handles zero', () => {
-      expect(getDigitsArray(0)).toEqual([0]);
-    });
-
-    test('handles large numbers', () => {
-      expect(getDigitsArray(987654321)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    });
-
-    test('handles negative numbers (uses absolute value)', () => {
-      expect(getDigitsArray(-456)).toEqual([6, 5, 4]);
     });
   });
 });

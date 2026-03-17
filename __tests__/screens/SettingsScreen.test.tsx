@@ -5,19 +5,6 @@ import { act } from 'react-test-renderer';
 import SettingsScreen from '../../src/screens/SettingsScreen';
 import { useAppStore } from '../../src/store/appStore';
 
-/**
- * Settings Screen Tests
- *
- * Tests for Settings screen UI and functionality:
- * - Component rendering
- * - Hint toggle functionality
- * - State integration
- * - UI elements and accessibility
- *
- * NOTE: These tests currently cannot run due to Expo SDK 54 / Jest compatibility issues.
- * This is documented and will be addressed in Phase 8.
- */
-
 // Wrapper component to provide Paper theme
 const SettingsScreenWithTheme = () => (
   <PaperProvider>
@@ -33,20 +20,42 @@ describe('SettingsScreen', () => {
       useAppStore.setState({
         hintsEnabled: false,
         hintHelpShown: false,
+        currentEquation: '',
+        currentAnswer: '',
+        answerProgress: '',
+        indexCount: 0,
+        answerChoices: [],
+        correctAnswerIndex: 0,
+        move: 0,
+        moveCount: 0,
+        remainderHint: 0,
+        hintQuestion: '',
+        hintResult: '',
+        hintHighlightIndices: [],
       });
-      // Also reset any practice state that might interfere
-      useAppStore.getState().resetPractice();
     });
     // Wait for state to settle
     await Promise.resolve();
   });
 
   afterEach(async () => {
-    // Clean up after each test
+    // Clean up after each test — reset all fields set in beforeEach
     act(() => {
       useAppStore.setState({
         hintsEnabled: false,
         hintHelpShown: false,
+        currentEquation: '',
+        currentAnswer: '',
+        answerProgress: '',
+        indexCount: 0,
+        answerChoices: [],
+        correctAnswerIndex: 0,
+        move: 0,
+        moveCount: 0,
+        remainderHint: 0,
+        hintQuestion: '',
+        hintResult: '',
+        hintHighlightIndices: [],
       });
     });
     await Promise.resolve();

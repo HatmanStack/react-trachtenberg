@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { StyleSheet, View, ScrollView, Alert, Animated, Dimensions } from 'react-native';
+import { StyleSheet, View, ScrollView, Alert, Animated, useWindowDimensions } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 import { useAppStore } from '../store/appStore';
 import { AnswerButton } from '../components/AnswerButton';
@@ -15,16 +15,15 @@ import {
   MIN_HINTS_BEFORE_ANSWER,
 } from '../constants/algorithm';
 
-const { width } = Dimensions.get('window');
-const isLargeScreen = width > 768;
-
 export default function PracticeScreen() {
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width > 768;
+
   const currentEquation = useAppStore((state) => state.currentEquation);
   const answerProgress = useAppStore((state) => state.answerProgress);
   const answerChoices = useAppStore((state) => state.answerChoices);
   const generateNewProblem = useAppStore((state) => state.generateNewProblem);
   const submitAnswer = useAppStore((state) => state.submitAnswer);
-  const correctAnswerIndex = useAppStore((state) => state.correctAnswerIndex);
   const indexCount = useAppStore((state) => state.indexCount);
 
   // Hint state
@@ -45,11 +44,6 @@ export default function PracticeScreen() {
     if (!currentEquation) return 'Loading...';
     return formatEquationWithPadding(currentEquation, indexCount, hintsEnabled);
   }, [currentEquation, indexCount, hintsEnabled]);
-
-  // Debug: Log hint state on render
-  logger.debug('PracticeScreen render - move:', move, 'moveCount:', moveCount, 'hintsEnabled:', hintsEnabled);
-  logger.debug('PracticeScreen render - hintQuestion:', hintQuestion, 'hintResult:', hintResult);
-  logger.debug('PracticeScreen render - answerChoices:', answerChoices, 'indexCount:', indexCount, 'answerProgress:', answerProgress);
 
   // Animated values for feedback and hint display
   const feedbackOpacity = useRef(new Animated.Value(0)).current;
@@ -86,6 +80,14 @@ export default function PracticeScreen() {
     hintOpacity.setValue(0);
   }, [hintOpacity]);
 
+  // Clean up pending timeouts on unmount
+  const cleanup = useAppStore((state) => state.cleanup);
+  const hintHelpTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    cleanup();
+    if (hintHelpTimeoutRef.current) clearTimeout(hintHelpTimeoutRef.current);
+  }, [cleanup]);
+
   // Generate first problem on mount
   useEffect(() => {
     logger.debug('PracticeScreen mounted, currentEquation:', currentEquation);
@@ -96,18 +98,24 @@ export default function PracticeScreen() {
     }
   }, [currentEquation, generateNewProblem]);
 
+  // Track which equation has already had hints initialized
+  const hintInitRef = useRef<string | null>(null);
+
   // Show hints when problem loads and hints are enabled
   useEffect(() => {
     if (currentEquation && hintsEnabled) {
+      if (hintInitRef.current === currentEquation) return;
+      hintInitRef.current = currentEquation;
       logger.debug('useEffect: Showing hints for equation:', currentEquation);
       showHints();
       // Call nextHint to show the first hint step
-      if (move === 0 && hintQuestion === '') {
-        logger.debug('useEffect: Initializing first hint');
-        nextHint();
-      }
+      logger.debug('useEffect: Initializing first hint');
+      nextHint();
+    } else if (!hintsEnabled) {
+      // Reset ref when hints are disabled so re-enabling triggers initialization
+      hintInitRef.current = null;
     }
-  }, [currentEquation, hintsEnabled, showHints, move, hintQuestion, nextHint]);
+  }, [currentEquation, hintsEnabled, showHints, nextHint]);
 
   const handleHintPress = useCallback(() => {
     logger.debug('handleHintPress - move:', move, 'moveCount:', moveCount, 'can advance:', move < moveCount);
@@ -119,7 +127,8 @@ export default function PracticeScreen() {
 
       // Show help message after first successful hint advance (not blocking)
       if (!hintHelpShown && move === 0) {
-        setTimeout(() => {
+        hintHelpTimeoutRef.current = setTimeout(() => {
+          hintHelpTimeoutRef.current = null;
           Alert.alert('Hint Help', 'Continue tapping the hint to see all steps');
           setHintHelpShown(true);
         }, 100);
@@ -131,7 +140,6 @@ export default function PracticeScreen() {
 
   const handleAnswerPress = useCallback((buttonIndex: number) => {
     logger.debug('handleAnswerPress called - buttonIndex:', buttonIndex, 'hintsEnabled:', hintsEnabled, 'move:', move, 'moveCount:', moveCount);
-    logger.debug('handleAnswerPress - current choices:', answerChoices, 'correctIndex:', correctAnswerIndex);
 
     // Enforce hint viewing when hints enabled
     // Must view at least MIN_HINTS_BEFORE_ANSWER hints before answering
@@ -165,7 +173,13 @@ export default function PracticeScreen() {
       // Hide hints on wrong answer
       hideHints();
     }
-  }, [hintsEnabled, move, submitAnswer, showFeedback, showHints, hideHints, answerChoices, correctAnswerIndex]);
+  }, [hintsEnabled, move, submitAnswer, showFeedback, showHints, hideHints]);
+
+  // Stable callbacks for AnswerButton to preserve React.memo
+  const handlePress0 = useCallback(() => handleAnswerPress(0), [handleAnswerPress]);
+  const handlePress1 = useCallback(() => handleAnswerPress(1), [handleAnswerPress]);
+  const handlePress2 = useCallback(() => handleAnswerPress(2), [handleAnswerPress]);
+  const handlePress3 = useCallback(() => handleAnswerPress(3), [handleAnswerPress]);
 
   return (
     <ScrollView
@@ -229,21 +243,21 @@ export default function PracticeScreen() {
           <View style={styles.buttonRow}>
             <AnswerButton
               value={answerChoices[0] ?? 0}
-              onPress={() => handleAnswerPress(0)}
+              onPress={handlePress0}
             />
             <AnswerButton
               value={answerChoices[1] ?? 0}
-              onPress={() => handleAnswerPress(1)}
+              onPress={handlePress1}
             />
           </View>
           <View style={styles.buttonRow}>
             <AnswerButton
               value={answerChoices[2] ?? 0}
-              onPress={() => handleAnswerPress(2)}
+              onPress={handlePress2}
             />
             <AnswerButton
               value={answerChoices[3] ?? 0}
-              onPress={() => handleAnswerPress(3)}
+              onPress={handlePress3}
             />
           </View>
         </View>

@@ -56,23 +56,3 @@ export function segmentText(
 
   return segments;
 }
-
-/**
- * Finds character indices in a string
- * @param text - The text to search
- * @param targets - Characters to find
- * @returns Array of indices where targets appear
- */
-export function findCharIndices(text: string, targets: string[]): number[] {
-  const indices: number[] = [];
-  const targetSet = new Set(targets);
-
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    if (char !== undefined && targetSet.has(char)) {
-      indices.push(i);
-    }
-  }
-
-  return indices;
-}

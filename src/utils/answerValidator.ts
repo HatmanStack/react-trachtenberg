@@ -8,7 +8,6 @@ export interface ValidationResult {
   isComplete: boolean;
   newIndexCount: number;
   newAnswerProgress: string;
-  newRemainder: number;
 }
 
 /**
@@ -19,15 +18,13 @@ export interface ValidationResult {
  * @param correctIndex - Index of correct answer (0-3)
  * @param currentAnswer - Full answer string
  * @param indexCount - Current digit position (0 = rightmost)
- * @param currentRemainder - Carry from previous digit
  * @returns Validation result with next state
  */
 export function validateAnswer(
   selectedIndex: number,
   correctIndex: number,
   currentAnswer: string,
-  indexCount: number,
-  currentRemainder: number
+  indexCount: number
 ): ValidationResult {
   const isCorrect = selectedIndex === correctIndex;
 
@@ -40,7 +37,6 @@ export function validateAnswer(
       newAnswerProgress: currentAnswer.substring(
         currentAnswer.length - indexCount
       ),
-      newRemainder: currentRemainder,
     };
   }
 
@@ -53,16 +49,10 @@ export function validateAnswer(
     currentAnswer.length - newIndexCount
   );
 
-  // Calculate remainder/carry for next digit
-  // Full calculation will be implemented in Phase 4 with hint system
-  // For now, this is a placeholder
-  const newRemainder = 0;
-
   return {
     isCorrect: true,
     isComplete,
     newIndexCount,
     newAnswerProgress,
-    newRemainder,
   };
 }

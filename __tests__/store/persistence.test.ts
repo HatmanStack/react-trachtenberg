@@ -19,7 +19,6 @@ describe('Store State Management', () => {
       currentAnswer: '',
       answerProgress: '',
       indexCount: 0,
-      firstCharRemainder: 0,
       answerChoices: [],
       correctAnswerIndex: 0,
       move: 0,
@@ -74,49 +73,6 @@ describe('Store State Management', () => {
     });
   });
 
-  describe('State Isolation', () => {
-    test('practice state is separate from settings state', () => {
-      const store = useAppStore.getState();
-
-      // Set up practice state
-      store.generateNewProblem();
-      store.setHintsEnabled(true);
-
-      // Verify both states exist independently
-      const state = useAppStore.getState();
-      expect(state.currentEquation).toBeTruthy();
-      expect(state.hintsEnabled).toBe(true);
-
-      // Reset practice doesn't affect settings
-      store.resetPractice();
-
-      const newState = useAppStore.getState();
-      expect(newState.currentEquation).toBe('');
-      expect(newState.hintsEnabled).toBe(true); // Settings unchanged
-    });
-
-    test('hint state is separate from practice progress', () => {
-      const store = useAppStore.getState();
-
-      // Generate a problem
-      store.generateNewProblem();
-
-      // Advance hints
-      store.nextHint();
-
-      const state = useAppStore.getState();
-      expect(state.hintQuestion).toBeTruthy();
-      expect(state.currentEquation).toBeTruthy();
-
-      // Reset hints doesn't affect practice
-      store.resetHints();
-
-      const newState = useAppStore.getState();
-      expect(newState.hintQuestion).toBe('');
-      expect(newState.currentEquation).toBeTruthy(); // Practice unchanged
-    });
-  });
-
   describe('State Consistency', () => {
     test('problem generation sets all required state', () => {
       const store = useAppStore.getState();
@@ -139,28 +95,6 @@ describe('Store State Management', () => {
       expect(state.remainderHint).toBe(0);
     });
 
-    test('reset clears all transient state', () => {
-      const store = useAppStore.getState();
-
-      // Set up some state
-      store.generateNewProblem();
-      store.nextHint();
-      store.setHintsEnabled(true);
-
-      // Reset practice
-      store.resetPractice();
-
-      const state = useAppStore.getState();
-
-      // Transient state cleared
-      expect(state.currentEquation).toBe('');
-      expect(state.currentAnswer).toBe('');
-      expect(state.hintQuestion).toBe('');
-      expect(state.move).toBe(0);
-
-      // Settings preserved
-      expect(state.hintsEnabled).toBe(true);
-    });
   });
 
   describe('Default Values', () => {
@@ -174,8 +108,7 @@ describe('Store State Management', () => {
         currentAnswer: '',
         answerProgress: '',
         indexCount: 0,
-        firstCharRemainder: 0,
-        answerChoices: [],
+          answerChoices: [],
         correctAnswerIndex: 0,
         move: 0,
         moveCount: 0,
@@ -195,7 +128,6 @@ describe('Store State Management', () => {
       expect(state.currentAnswer).toBe('');
       expect(state.answerProgress).toBe('');
       expect(state.indexCount).toBe(0);
-      expect(state.firstCharRemainder).toBe(0);
       expect(state.answerChoices).toEqual([]);
       expect(state.correctAnswerIndex).toBe(0);
       expect(state.move).toBe(0);
