@@ -94,9 +94,6 @@ export default function PracticeScreen() {
     }
   }, [currentEquation, generateNewProblem]);
 
-  // Track which equation has already had hints initialized
-  const hintInitRef = useRef<string | null>(null);
-
   // Show hints when problem loads and hints are enabled
   useEffect(() => {
     if (currentEquation && hintsEnabled) {
@@ -168,6 +165,12 @@ export default function PracticeScreen() {
     }
   }, [hintsEnabled, move, submitAnswer, showFeedback, showHints, hideHints, answerChoices, correctAnswerIndex]);
 
+  // Stable callbacks for AnswerButton to preserve React.memo
+  const handlePress0 = useCallback(() => handleAnswerPress(0), [handleAnswerPress]);
+  const handlePress1 = useCallback(() => handleAnswerPress(1), [handleAnswerPress]);
+  const handlePress2 = useCallback(() => handleAnswerPress(2), [handleAnswerPress]);
+  const handlePress3 = useCallback(() => handleAnswerPress(3), [handleAnswerPress]);
+
   return (
     <ScrollView
       style={styles.scrollView}
@@ -230,21 +233,21 @@ export default function PracticeScreen() {
           <View style={styles.buttonRow}>
             <AnswerButton
               value={answerChoices[0] ?? 0}
-              onPress={() => handleAnswerPress(0)}
+              onPress={handlePress0}
             />
             <AnswerButton
               value={answerChoices[1] ?? 0}
-              onPress={() => handleAnswerPress(1)}
+              onPress={handlePress1}
             />
           </View>
           <View style={styles.buttonRow}>
             <AnswerButton
               value={answerChoices[2] ?? 0}
-              onPress={() => handleAnswerPress(2)}
+              onPress={handlePress2}
             />
             <AnswerButton
               value={answerChoices[3] ?? 0}
-              onPress={() => handleAnswerPress(3)}
+              onPress={handlePress3}
             />
           </View>
         </View>
