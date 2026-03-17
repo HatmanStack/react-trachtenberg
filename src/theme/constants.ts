@@ -17,12 +17,3 @@ export const SPACING = {
   lg: 24,
   xl: 32,
 };
-
-export const FONT_SIZES = {
-  small: 12,
-  medium: 16,
-  large: 20,
-  xlarge: 24,
-};
-
-export const MAX_DIGIT_COUNT = 7; // Max answer length

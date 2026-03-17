@@ -70,22 +70,3 @@ export function getDigitAtPosition(number: number, position: number): number {
 
   return parseInt(char, 10);
 }
-
-/**
- * Extracts all digits from a number as an array (right-to-left)
- * @param number - The number to extract from
- * @returns Array of digits from right to left
- */
-export function getDigitsArray(number: number): number[] {
-  const str = Math.abs(number).toString();
-  const digits: number[] = [];
-
-  for (let i = str.length - 1; i >= 0; i--) {
-    const char = str[i];
-    if (char !== undefined) {
-      digits.push(parseInt(char, 10));
-    }
-  }
-
-  return digits;
-}

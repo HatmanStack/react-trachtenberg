@@ -1,4 +1,4 @@
-import { segmentText, findCharIndices } from '../../src/utils/textHighlighter';
+import { segmentText } from '../../src/utils/textHighlighter';
 
 describe('textHighlighter utilities', () => {
   describe('segmentText', () => {
@@ -71,33 +71,6 @@ describe('textHighlighter utilities', () => {
         { text: 'e', isHighlighted: true },
         { text: 'llo', isHighlighted: false }
       ]);
-    });
-  });
-
-  describe('findCharIndices', () => {
-    test('finds single character', () => {
-      const result = findCharIndices('hello world', ['o']);
-      expect(result).toEqual([4, 7]);
-    });
-
-    test('finds multiple different characters', () => {
-      const result = findCharIndices('hello world', ['l', 'o']);
-      expect(result).toEqual([2, 3, 4, 7, 9]);
-    });
-
-    test('returns empty array when no matches', () => {
-      const result = findCharIndices('hello', ['x', 'y']);
-      expect(result).toEqual([]);
-    });
-
-    test('handles empty target array', () => {
-      const result = findCharIndices('hello', []);
-      expect(result).toEqual([]);
-    });
-
-    test('works with numbers in strings', () => {
-      const result = findCharIndices('123456 × 789', ['3', '9']);
-      expect(result).toEqual([2, 11]);
     });
   });
 });
