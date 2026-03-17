@@ -121,11 +121,10 @@ describe('[PracticeScreen]', () => {
       useAppStore.getState().generateNewProblem();
     });
 
-    const state = useAppStore.getState();
-    const correctIndex = state.correctAnswerIndex;
+    const { correctAnswerIndex, answerChoices } = useAppStore.getState();
     // Pick any non-correct index
-    const wrongIndex = (correctIndex + 1) % 4;
-    const wrongValue = state.answerChoices[wrongIndex];
+    const wrongIndex = (correctAnswerIndex + 1) % 4;
+    const wrongValue = answerChoices[wrongIndex];
 
     const { getByText } = render(<PracticeScreenWithTheme />);
 
@@ -162,20 +161,14 @@ describe('[PracticeScreen]', () => {
 
     render(<PracticeScreenWithTheme />);
 
-    // The HintDisplay should be rendered (even if empty initially)
-    // After generating a problem with hints enabled, nextHint should be called
-    const state = useAppStore.getState();
-    // Hint question should be populated after initialization
-    // (the useEffect calls nextHint when hints enabled)
-    expect(state.hintsEnabled).toBe(true);
+    // The HintDisplay should be rendered and hints should still be enabled
+    expect(useAppStore.getState().hintsEnabled).toBe(true);
   });
 
-  it('should display Loading... when no equation is set', () => {
+  it('should auto-generate a problem when equation is empty', () => {
     // Don't generate a problem, keep equation empty
-    const { getByText } = render(<PracticeScreenWithTheme />);
-    // The screen should show Loading... or generate a problem via useEffect
-    // Since useEffect runs, it will generate a problem, but we can check
-    // the initial memo behavior
+    render(<PracticeScreenWithTheme />);
+    // The useEffect should trigger generateNewProblem
     expect(useAppStore.getState().currentEquation).not.toBe('');
   });
 });
