@@ -12,7 +12,6 @@ module.exports = {
     '^@store/(.*)$': '<rootDir>/src/store/$1',
     '^@data/(.*)$': '<rootDir>/src/data/$1',
     '^@theme/(.*)$': '<rootDir>/src/theme/$1',
-    '^@navigation/(.*)$': '<rootDir>/src/navigation/$1',
     '^@types/(.*)$': '<rootDir>/src/types/$1',
   },
   collectCoverageFrom: [
