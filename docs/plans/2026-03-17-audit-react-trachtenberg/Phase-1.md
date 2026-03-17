@@ -48,13 +48,13 @@ Remove all dead code, unused dependencies, and placeholder tests identified acro
 5. Run verification checks
 
 **Verification Checklist:**
-- [ ] `src/navigation/` directory no longer exists
-- [ ] `App.tsx` no longer exists
-- [ ] `__tests__/navigation/` directory no longer exists
-- [ ] `jest.config.js` has no `@navigation` alias
-- [ ] `npm test` passes
-- [ ] `npm run lint` passes
-- [ ] `npx tsc --noEmit` passes
+- [x] `src/navigation/` directory no longer exists
+- [x] `App.tsx` no longer exists
+- [x] `__tests__/navigation/` directory no longer exists
+- [x] `jest.config.js` has no `@navigation` alias
+- [x] `npm test` passes
+- [x] `npm run lint` passes
+- [x] `npx tsc --noEmit` passes
 - [ ] App still loads via `npx expo start --web` (manual spot check)
 
 **Commit Message Template:**
@@ -85,10 +85,10 @@ chore(navigation): remove dead React Navigation system and App.tsx
 5. Run verification checks
 
 **Verification Checklist:**
-- [ ] `src/types/index.ts` contains only `TutorialStep`, `PracticeProblem`, and `AnswerChoice`
-- [ ] No TypeScript compilation errors (`npx tsc --noEmit`)
-- [ ] `npm test` passes
-- [ ] `npm run lint` passes
+- [x] `src/types/index.ts` contains only `TutorialStep`, `PracticeProblem`, and `AnswerChoice`
+- [x] No TypeScript compilation errors (`npx tsc --noEmit`)
+- [x] `npm test` passes
+- [x] `npm run lint` passes
 
 **Commit Message Template:**
 ```
@@ -118,10 +118,10 @@ chore(types): remove unused branded type system
 5. Run verification checks
 
 **Verification Checklist:**
-- [ ] `src/utils/problemGenerator.ts` imports `PracticeProblem` from `../types`
-- [ ] No local `PracticeProblem` definition remains in `problemGenerator.ts`
-- [ ] `npx tsc --noEmit` passes
-- [ ] `npm test` passes
+- [x] `src/utils/problemGenerator.ts` imports `PracticeProblem` from `../types`
+- [x] No local `PracticeProblem` definition remains in `problemGenerator.ts`
+- [x] `npx tsc --noEmit` passes
+- [x] `npm test` passes
 
 **Commit Message Template:**
 ```
@@ -155,13 +155,13 @@ chore(types): deduplicate PracticeProblem interface
 7. Run verification checks
 
 **Verification Checklist:**
-- [ ] `findCharIndices` no longer exists in `textHighlighter.ts`
-- [ ] `getDigitsArray` no longer exists in `answerChoices.ts`
-- [ ] `FONT_SIZES` and `MAX_DIGIT_COUNT` no longer exist in `constants.ts`
-- [ ] `LoadingIndicator.tsx` no longer exists
-- [ ] `npm test` passes
-- [ ] `npm run lint` passes
-- [ ] `npx tsc --noEmit` passes
+- [x] `findCharIndices` no longer exists in `textHighlighter.ts`
+- [x] `getDigitsArray` no longer exists in `answerChoices.ts`
+- [x] `FONT_SIZES` and `MAX_DIGIT_COUNT` no longer exist in `constants.ts`
+- [x] `LoadingIndicator.tsx` no longer exists
+- [x] `npm test` passes
+- [x] `npm run lint` passes
+- [x] `npx tsc --noEmit` passes
 
 **Commit Message Template:**
 ```
@@ -198,13 +198,13 @@ chore: remove dead exports and unused components
 6. Run verification checks
 
 **Verification Checklist:**
-- [ ] `postcss-value-parser` not in `package.json`
-- [ ] `@react-native-async-storage/async-storage` not in `package.json`
-- [ ] `@react-navigation/*` packages not in `package.json`
-- [ ] `npm ci` installs successfully
-- [ ] `npm test` passes
-- [ ] `npm run lint` passes
-- [ ] `npx tsc --noEmit` passes
+- [x] `postcss-value-parser` not in `package.json`
+- [x] `@react-native-async-storage/async-storage` not in `package.json`
+- [x] `@react-navigation/*` packages not in `package.json`
+- [x] `npm ci` installs successfully
+- [x] `npm test` passes
+- [x] `npm run lint` passes
+- [x] `npx tsc --noEmit` passes
 
 **Commit Message Template:**
 ```
@@ -237,10 +237,10 @@ chore(deps): remove unused dependencies
 4. Run verification checks
 
 **Verification Checklist:**
-- [ ] `__tests__/smoke.test.ts` no longer exists
-- [ ] Dead persistence tests removed (if applicable)
-- [ ] `npm test` passes
-- [ ] Test count decreased by the number of removed test files
+- [x] `__tests__/smoke.test.ts` no longer exists
+- [x] Dead persistence tests removed (if applicable) — persistence.test.ts KEPT: tests real store behavior, not AsyncStorage
+- [x] `npm test` passes
+- [x] Test count decreased by the number of removed test files
 
 **Commit Message Template:**
 ```
