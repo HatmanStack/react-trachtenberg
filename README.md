@@ -17,7 +17,7 @@ A cross-platform mobile and web application to teach the [Trachtenberg method](h
 
 ## ✨ Features
 
-* **Interactive Tutorial**: 18-step guided tutorial teaching the complete Trachtenberg multiplication method.
+* **Interactive Tutorial**: 21-step guided tutorial teaching the complete Trachtenberg multiplication method.
 * **Practice Mode**: Solve random multiplication problems (4-digit × 3-digit) with a progressive answer-building UI.
 * **Hint System**: Get step-by-step calculation guidance for practice problems.
 * **Settings**: Customize your experience with options to toggle hints and other preferences.
@@ -31,8 +31,8 @@ A cross-platform mobile and web application to teach the [Trachtenberg method](h
 * **Platform:** [Expo](https://expo.dev/)
 * **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
 * **UI Library:** [React Native Paper](https://reactnativepaper.com/) (Material Design 3)
-* **State Management:** [Zustand](https://github.com/pmndrs/zustand) with [AsyncStorage](https://react-native-async-storage.github.io/async-storage/) persistence
-* **Navigation:** [React Navigation](https://reactnavigation.org/)
+* **State Management:** [Zustand](https://github.com/pmndrs/zustand)
+* **Navigation:** [Expo Router](https://docs.expo.dev/router/introduction/)
 * **Testing:** [Jest](https://jestjs.io/) with [React Native Testing Library](https://testing-library.com/docs/react-native-testing-library/intro/)
 * **Build:** EAS Build
 
@@ -51,7 +51,7 @@ A cross-platform mobile and web application to teach the [Trachtenberg method](h
 1.  **Clone the repository:**
     ```bash
     git clone <your-repo-url>
-    cd android-trachtenberg/Migration/expo-project
+    cd react-trachtenberg
     ```
 
 2.  **Install dependencies:**
