@@ -9,12 +9,7 @@ import {
   SECOND_NUMBER_MIN,
   SECOND_NUMBER_MAX,
 } from '../constants/algorithm';
-
-export interface PracticeProblem {
-  firstNumber: number;  // 4-digit number (1000-9999)
-  secondNumber: number; // 3-digit number (100-999)
-  answer: number;       // firstNumber * secondNumber
-}
+import { PracticeProblem } from '../types';
 
 /**
  * Generates a random multiplication problem
