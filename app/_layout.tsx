@@ -3,6 +3,7 @@ import { PaperProvider, useTheme } from 'react-native-paper';
 import { paperTheme } from '../src/theme/paperTheme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Platform, View, StyleSheet, useWindowDimensions } from 'react-native';
+import { ErrorBoundary } from '../src/components/ErrorBoundary';
 
 function TabLayout() {
   const theme = useTheme();
@@ -75,11 +76,13 @@ function TabLayout() {
 
 export default function RootLayout() {
   return (
-    <PaperProvider theme={paperTheme}>
-      <View style={styles.outer}>
-        <TabLayout />
-      </View>
-    </PaperProvider>
+    <ErrorBoundary>
+      <PaperProvider theme={paperTheme}>
+        <View style={styles.outer}>
+          <TabLayout />
+        </View>
+      </PaperProvider>
+    </ErrorBoundary>
   );
 }
 
