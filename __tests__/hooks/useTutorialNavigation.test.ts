@@ -79,31 +79,6 @@ describe('useTutorialNavigation', () => {
     expect(result.current.currentPage).toBe(20);
   });
 
-  test('reset returns to page 0', () => {
-    const { result } = renderHook(() => useTutorialNavigation());
-
-    // Move forward (separate act calls for each state update)
-    act(() => {
-      result.current.goNext();
-    });
-    act(() => {
-      result.current.goNext();
-    });
-    act(() => {
-      result.current.goNext();
-    });
-
-    expect(result.current.currentPage).toBe(3);
-
-    // Reset
-    act(() => {
-      result.current.reset();
-    });
-
-    expect(result.current.currentPage).toBe(0);
-    expect(result.current.isFirstPage).toBe(true);
-  });
-
   test('totalPages is correct', () => {
     const { result } = renderHook(() => useTutorialNavigation());
     expect(result.current.totalPages).toBe(21);

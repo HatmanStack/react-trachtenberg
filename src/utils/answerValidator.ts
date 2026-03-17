@@ -53,9 +53,10 @@ export function validateAnswer(
     currentAnswer.length - newIndexCount
   );
 
-  // Calculate remainder/carry for next digit
-  // Full calculation will be implemented in Phase 4 with hint system
-  // For now, this is a placeholder
+  // The carry value for the next digit is computed by the store via
+  // Math.floor(state.remainderHint / 10) in appStore.ts, not here.
+  // The store overwrites this field with the hint system's carry value.
+  // This is an intentional design choice — see ADR-4 in Phase-0.md.
   const newRemainder = 0;
 
   return {
