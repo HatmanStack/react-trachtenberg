@@ -80,9 +80,13 @@ export default function PracticeScreen() {
     hintOpacity.setValue(0);
   }, [hintOpacity]);
 
-  // Clean up pending timeout on unmount
+  // Clean up pending timeouts on unmount
   const cleanup = useAppStore((state) => state.cleanup);
-  useEffect(() => () => { cleanup(); }, [cleanup]);
+  const hintHelpTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    cleanup();
+    if (hintHelpTimeoutRef.current) clearTimeout(hintHelpTimeoutRef.current);
+  }, [cleanup]);
 
   // Generate first problem on mount
   useEffect(() => {
@@ -123,7 +127,8 @@ export default function PracticeScreen() {
 
       // Show help message after first successful hint advance (not blocking)
       if (!hintHelpShown && move === 0) {
-        setTimeout(() => {
+        hintHelpTimeoutRef.current = setTimeout(() => {
+          hintHelpTimeoutRef.current = null;
           Alert.alert('Hint Help', 'Continue tapping the hint to see all steps');
           setHintHelpShown(true);
         }, 100);

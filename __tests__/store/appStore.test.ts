@@ -84,12 +84,12 @@ describe('[AppStore]', () => {
 
       const result = store.submitAnswer(correctAnswerIndex);
       expect(result.isCorrect).toBe(true);
+      // Multi-digit answer guaranteed by retry loop — first digit can't complete
+      expect(result.isComplete).toBe(false);
 
-      if (!result.isComplete) {
-        const stateAfterSubmit = useAppStore.getState();
-        // Math.floor(5 / 10) === 0
-        expect(stateAfterSubmit.remainderHint).toBe(0);
-      }
+      const stateAfterSubmit = useAppStore.getState();
+      // Math.floor(5 / 10) === 0
+      expect(stateAfterSubmit.remainderHint).toBe(0);
     });
 
     it('should propagate non-zero carry when remainderHint >= 10', () => {
@@ -110,12 +110,12 @@ describe('[AppStore]', () => {
 
       const result = store.submitAnswer(correctAnswerIndex);
       expect(result.isCorrect).toBe(true);
+      // Multi-digit answer guaranteed by retry loop — first digit can't complete
+      expect(result.isComplete).toBe(false);
 
-      if (!result.isComplete) {
-        const stateAfterSubmit = useAppStore.getState();
-        expect(stateAfterSubmit.remainderHint).toBe(2);
-        expect(stateAfterSubmit.hintResult).toBe('2 + ');
-      }
+      const stateAfterSubmit = useAppStore.getState();
+      expect(stateAfterSubmit.remainderHint).toBe(2);
+      expect(stateAfterSubmit.hintResult).toBe('2 + ');
     });
   });
 
