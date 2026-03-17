@@ -46,9 +46,6 @@ export default function PracticeScreen() {
     return formatEquationWithPadding(currentEquation, indexCount, hintsEnabled);
   }, [currentEquation, indexCount, hintsEnabled]);
 
-  // Track which equation has already had hints initialized
-  const hintInitRef = useRef<string | null>(null);
-
   // Animated values for feedback and hint display
   const feedbackOpacity = useRef(new Animated.Value(0)).current;
   const hintOpacity = useRef(new Animated.Value(0)).current;
@@ -93,6 +90,9 @@ export default function PracticeScreen() {
       logger.debug('After generateNewProblem call');
     }
   }, [currentEquation, generateNewProblem]);
+
+  // Track which equation has already had hints initialized
+  const hintInitRef = useRef<string | null>(null);
 
   // Show hints when problem loads and hints are enabled
   useEffect(() => {
