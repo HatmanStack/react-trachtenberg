@@ -244,10 +244,10 @@ chore(deps): remove unused dependencies
 
 **Commit Message Template:**
 ```
-chore(test): remove placeholder and dead tests
+chore(test): remove placeholder smoke test; evaluate persistence tests
 
 - Remove smoke.test.ts (expect(true).toBe(true))
-- Remove persistence.test.ts (tests non-existent AsyncStorage integration)
+- Evaluate persistence.test.ts: keep if it tests real store behavior, remove only if it tests non-existent AsyncStorage integration
 ```
 
 ---

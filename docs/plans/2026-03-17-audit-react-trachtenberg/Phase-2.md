@@ -207,11 +207,13 @@ npm test && npm run lint && npx tsc --noEmit
 **Files to create:**
 - `__tests__/store/appStore.test.ts`
 
+**Important — check for overlap:** If `__tests__/store/persistence.test.ts` was kept in Phase 1 (see Task 6), read it first. It already covers `generateNewProblem` initialization (lines ~121-140) and `resetPractice` clearing state (lines ~142-163). Do not duplicate those assertions. Either import/extend the existing file or ensure `appStore.test.ts` tests only the aspects not already covered (carry propagation, timeout lifecycle). If there is significant overlap, consolidate into a single file and delete the other.
+
 **Tests to write:**
 1. **Carry propagation:** Call `generateNewProblem()`, then exercise `submitAnswer()` across multiple digit positions. Verify that `remainderHint` is correctly propagated via `Math.floor(state.remainderHint / 10)`.
 2. **Timeout lifecycle:** Call `submitAnswer()` with a completing answer, verify that `generateNewProblem` is called after `PROBLEM_COMPLETE_DELAY_MS`. Use `jest.useFakeTimers()`.
-3. **resetPractice clears timeout:** Start a completion timeout, call `resetPractice()`, advance timers, verify no new problem was generated.
-4. **generateNewProblem initializes hint state:** Call `generateNewProblem()` and verify `move`, `moveCount`, `hintQuestion`, `hintResult`, `hintHighlightIndices` are initialized.
+3. **resetPractice clears timeout:** Start a completion timeout, call `resetPractice()`, advance timers, verify no new problem was generated. (Check if `persistence.test.ts` already covers the non-timeout aspects of resetPractice — if so, test only the timeout-clearing behavior here.)
+4. **generateNewProblem initializes hint state:** Call `generateNewProblem()` and verify `move`, `moveCount`, `hintQuestion`, `hintResult`, `hintHighlightIndices` are initialized. (Skip if `persistence.test.ts` already covers this — see overlap note above.)
 
 **Verification:**
 ```bash
@@ -261,9 +263,7 @@ npm test && npm run lint && npx tsc --noEmit
 **Files to modify (add tests to existing files):**
 - `__tests__/utils/answerValidator.test.ts` — Add tests for: out-of-bounds `selectedIndex`, empty `currentAnswer`, `indexCount` exceeding answer length
 - `__tests__/utils/answerChoices.test.ts` — Add tests for: `correctDigit` at boundaries (0, 9), verify all four choices are unique, verify correct digit is at `correctIndex`
-
-**Files to create:**
-- `__tests__/utils/problemGenerator.test.ts` — Test `generateProblem()` produces valid range, `formatEquation()` format, `formatEquationWithPadding()` with various indexCount values
+- `__tests__/utils/problemGenerator.test.ts` — This file already exists (~135 lines) with tests covering `generateProblem()` valid range, `formatEquation()` format, and `isValidProblem()`. **Do not recreate it.** Add only missing edge-case tests: `formatEquationWithPadding()` with various `indexCount` values, boundary conditions for `generateProblem()`, and any other gaps not already covered. Review existing tests first to avoid duplication.
 
 **Verification:**
 ```bash
