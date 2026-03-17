@@ -43,11 +43,9 @@ interface AppState {
   // Practice actions
   generateNewProblem: () => void;
   submitAnswer: (buttonIndex: number) => { isCorrect: boolean; isComplete: boolean };
-  resetPractice: () => void;
 
   // Hint actions
   nextHint: () => void;            // Advance to next hint step
-  resetHints: () => void;          // Reset hint state for new digit
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
@@ -194,29 +192,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
         return { isCorrect: true, isComplete: false };
       },
 
-      resetPractice: () => {
-        // Clear any pending timeout
-        if (problemCompleteTimeoutId !== null) {
-          clearTimeout(problemCompleteTimeoutId);
-          problemCompleteTimeoutId = null;
-        }
-        set({
-          currentEquation: '',
-          currentAnswer: '',
-          answerProgress: '',
-          indexCount: 0,
-          firstCharRemainder: 0,
-          answerChoices: [],
-          correctAnswerIndex: 0,
-          move: 0,
-          moveCount: 0,
-          remainderHint: 0,
-          hintQuestion: '',
-          hintResult: '',
-          hintHighlightIndices: [],
-        });
-      },
-
       // Hint actions
       nextHint: () => {
         const state = get();
@@ -259,14 +234,4 @@ export const useAppStore = create<AppState>()((set, get) => ({
         logger.debug('nextHint: verified new state - question:', newState.hintQuestion, 'result:', newState.hintResult);
       },
 
-      resetHints: () => {
-        set({
-          move: 0,
-          moveCount: 0,
-          remainderHint: 0,
-          hintQuestion: '',
-          hintResult: '',
-          hintHighlightIndices: [],
-        });
-      },
     }));

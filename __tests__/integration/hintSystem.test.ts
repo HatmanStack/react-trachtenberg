@@ -273,38 +273,4 @@ describe('Hint System Integration', () => {
     });
   });
 
-  describe('Store Action Integration', () => {
-    test('resetPractice should clear all hint state', () => {
-      const store = useAppStore.getState();
-      store.generateNewProblem();
-      store.nextHint();
-
-      // Reset
-      store.resetPractice();
-
-      // All hint state should be reset
-      const state = useAppStore.getState();
-      expect(state.move).toBe(0);
-      expect(state.moveCount).toBe(0);
-      expect(state.remainderHint).toBe(0);
-      expect(state.hintQuestion).toBe('');
-      expect(state.hintResult).toBe('');
-      expect(state.hintHighlightIndices).toEqual([]);
-    });
-
-    test('resetHints should clear hint display state', () => {
-      const store = useAppStore.getState();
-      store.generateNewProblem();
-      store.nextHint();
-
-      // Reset hints
-      store.resetHints();
-
-      // Hint state should be cleared
-      const state = useAppStore.getState();
-      expect(state.move).toBe(0);
-      expect(state.hintQuestion).toBe('');
-      expect(state.hintResult).toBe('');
-    });
-  });
 });

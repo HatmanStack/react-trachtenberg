@@ -33,9 +33,20 @@ describe('SettingsScreen', () => {
       useAppStore.setState({
         hintsEnabled: false,
         hintHelpShown: false,
+        currentEquation: '',
+        currentAnswer: '',
+        answerProgress: '',
+        indexCount: 0,
+        firstCharRemainder: 0,
+        answerChoices: [],
+        correctAnswerIndex: 0,
+        move: 0,
+        moveCount: 0,
+        remainderHint: 0,
+        hintQuestion: '',
+        hintResult: '',
+        hintHighlightIndices: [],
       });
-      // Also reset any practice state that might interfere
-      useAppStore.getState().resetPractice();
     });
     // Wait for state to settle
     await Promise.resolve();
