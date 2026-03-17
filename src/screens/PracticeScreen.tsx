@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { StyleSheet, View, ScrollView, Alert, Animated, Dimensions } from 'react-native';
+import { StyleSheet, View, ScrollView, Alert, Animated, useWindowDimensions } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 import { useAppStore } from '../store/appStore';
 import { AnswerButton } from '../components/AnswerButton';
@@ -15,10 +15,10 @@ import {
   MIN_HINTS_BEFORE_ANSWER,
 } from '../constants/algorithm';
 
-const { width } = Dimensions.get('window');
-const isLargeScreen = width > 768;
-
 export default function PracticeScreen() {
+  const { width } = useWindowDimensions();
+  const isLargeScreen = width > 768;
+
   const currentEquation = useAppStore((state) => state.currentEquation);
   const answerProgress = useAppStore((state) => state.answerProgress);
   const answerChoices = useAppStore((state) => state.answerChoices);
