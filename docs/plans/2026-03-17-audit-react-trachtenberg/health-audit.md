@@ -1,7 +1,7 @@
 ---
 type: repo-health
 goal: General health check — scan all 4 vectors equally
-deployment_target: Serverless (Lambda, Cloud Functions)
+deployment_target: Mobile (iOS/Android) + Expo Web
 scope: Full repo, no constraints
 existing_tooling: Full setup — linters, CI pipeline, pre-commit hooks, type checking
 ---

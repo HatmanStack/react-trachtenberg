@@ -194,8 +194,9 @@ chore: remove dead exports and unused components
 2. Remove all five packages from `package.json` dependencies
 3. Run `npm install` to update `package-lock.json`
 4. Also remove `@react-native-async-storage` from the `transformIgnorePatterns` in `jest.config.js` (line 6) — it is no longer needed
-5. Run `npm audit fix` to address the 18 known vulnerabilities while we are modifying dependencies
-6. Run verification checks
+5. Run verification checks
+
+> **Note:** Dependency vulnerability remediation (e.g., `npm audit fix`) is intentionally excluded from Phase 1. Vulnerability upgrades are non-deterministic and may introduce behavioral changes. These will be handled in a dedicated **Dependency Hardening** phase with explicit pinned versions and separate validation steps.
 
 **Verification Checklist:**
 - [x] `postcss-value-parser` not in `package.json`
@@ -213,7 +214,6 @@ chore(deps): remove unused dependencies
 - Remove postcss-value-parser (never imported)
 - Remove @react-native-async-storage/async-storage (never used despite README claim)
 - Remove @react-navigation/* packages (dead navigation system removed)
-- Run npm audit fix for known vulnerabilities
 ```
 
 ---

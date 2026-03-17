@@ -14,10 +14,7 @@ jest.mock('react-native/Libraries/Alert/Alert', () => ({
 // The version mismatch only surfaces when useNativeDriver is true and triggers
 // the native renderer. Setting useNativeDriver to false avoids this.
 const RN = require('react-native');
-const originalTiming = RN.Animated.timing;
-RN.Animated.timing = (value: unknown, config: Record<string, unknown>) => {
-  return originalTiming(value, { ...config, useNativeDriver: false });
-};
+let originalTiming: typeof RN.Animated.timing;
 
 const PracticeScreenWithTheme = () => (
   <PaperProvider>
@@ -48,6 +45,17 @@ const resetStore = () => {
 };
 
 describe('[PracticeScreen]', () => {
+  beforeAll(() => {
+    originalTiming = RN.Animated.timing;
+    RN.Animated.timing = (value: unknown, config: Record<string, unknown>) => {
+      return originalTiming(value, { ...config, useNativeDriver: false });
+    };
+  });
+
+  afterAll(() => {
+    RN.Animated.timing = originalTiming;
+  });
+
   beforeEach(() => {
     jest.useFakeTimers();
     resetStore();
@@ -98,7 +106,7 @@ describe('[PracticeScreen]', () => {
       useAppStore.getState().generateNewProblem();
     });
 
-    const { correctAnswerIndex, answerChoices } = useAppStore.getState();
+    const { correctAnswerIndex, answerChoices, currentAnswer } = useAppStore.getState();
     const correctValue = answerChoices[correctAnswerIndex];
 
     const { getByText } = render(<PracticeScreenWithTheme />);
@@ -107,11 +115,10 @@ describe('[PracticeScreen]', () => {
     const correctButton = getByText(String(correctValue!));
     fireEvent.press(correctButton);
 
-    // Should show feedback
-    // The feedback text could be 'Correct!' or 'Complete!'
-    try {
+    // Multi-digit answers show "Correct!", single-digit show "Complete!"
+    if (currentAnswer.length > 1) {
       expect(getByText('Correct!')).toBeTruthy();
-    } catch {
+    } else {
       expect(getByText('Complete!')).toBeTruthy();
     }
   });
@@ -159,10 +166,15 @@ describe('[PracticeScreen]', () => {
       useAppStore.getState().generateNewProblem();
     });
 
-    render(<PracticeScreenWithTheme />);
+    const { getByText } = render(<PracticeScreenWithTheme />);
 
-    // The HintDisplay should be rendered and hints should still be enabled
-    expect(useAppStore.getState().hintsEnabled).toBe(true);
+    // HintDisplay renders "Touch to see hint" as default or shows hint question
+    const { hintQuestion } = useAppStore.getState();
+    if (hintQuestion) {
+      expect(getByText(hintQuestion)).toBeTruthy();
+    } else {
+      expect(getByText('Touch to see hint')).toBeTruthy();
+    }
   });
 
   it('should auto-generate a problem when equation is empty', () => {
@@ -170,5 +182,22 @@ describe('[PracticeScreen]', () => {
     render(<PracticeScreenWithTheme />);
     // The useEffect should trigger generateNewProblem
     expect(useAppStore.getState().currentEquation).not.toBe('');
+  });
+
+  it('should auto-initialize hints when equation loads with hints enabled', () => {
+    act(() => {
+      useAppStore.setState({ hintsEnabled: true });
+    });
+
+    // Render triggers generateNewProblem (equation is empty), which triggers hint init
+    render(<PracticeScreenWithTheme />);
+
+    const state = useAppStore.getState();
+    // Hints should have been initialized: hintQuestion or hintResult should be populated
+    expect(state.currentEquation).not.toBe('');
+    // The useEffect calls showHints() and nextHint(), so move should have advanced
+    expect(state.hintsEnabled).toBe(true);
+    // hintQuestion should be populated after nextHint() runs
+    expect(state.hintQuestion).not.toBe('');
   });
 });

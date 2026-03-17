@@ -94,10 +94,10 @@ export function formatEquationWithPadding(
  */
 export function isValidProblem(problem: PracticeProblem): boolean {
   return (
-    problem.firstNumber >= 1000 &&
-    problem.firstNumber < 10000 &&
-    problem.secondNumber >= 100 &&
-    problem.secondNumber < 1000 &&
+    problem.firstNumber >= FIRST_NUMBER_MIN &&
+    problem.firstNumber < FIRST_NUMBER_MAX &&
+    problem.secondNumber >= SECOND_NUMBER_MIN &&
+    problem.secondNumber < SECOND_NUMBER_MAX &&
     problem.answer === problem.firstNumber * problem.secondNumber
   );
 }

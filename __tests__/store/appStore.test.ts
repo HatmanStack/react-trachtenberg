@@ -40,14 +40,16 @@ describe('[AppStore]', () => {
     it('should compute carry digit from remainderHint when advancing to next digit', () => {
       const store = useAppStore.getState();
 
-      // Generate a problem
-      store.generateNewProblem();
+      // Generate problems until we get a multi-digit answer (required for carry test)
+      let attempts = 0;
+      do {
+        store.generateNewProblem();
+        attempts++;
+      } while (useAppStore.getState().currentAnswer.length <= 1 && attempts < 20);
+      expect(useAppStore.getState().currentAnswer.length).toBeGreaterThan(1);
 
       const stateAfterGen = useAppStore.getState();
-      const { correctAnswerIndex, currentAnswer } = stateAfterGen;
-
-      // Only test carry if the answer has more than one digit
-      if (currentAnswer.length <= 1) return;
+      const { correctAnswerIndex } = stateAfterGen;
 
       // Advance hint to accumulate a remainderHint
       // The hint system calculates remainderHint during nextHint()
@@ -131,11 +133,9 @@ describe('[AppStore]', () => {
       const store = useAppStore.getState();
       expect(store.currentEquation).toBe('');
 
-      // Should not throw
-      expect(() => store.submitAnswer(0)).not.toThrow();
-      const result = store.submitAnswer(0);
-      // With empty answer and indexCount 0, the answer is trivially "complete"
-      // but correctAnswerIndex is 0 so buttonIndex 0 matches
+      // Should not throw, and result should be defined
+      let result: ReturnType<typeof store.submitAnswer> | undefined;
+      expect(() => { result = store.submitAnswer(0); }).not.toThrow();
       expect(result).toBeDefined();
     });
 

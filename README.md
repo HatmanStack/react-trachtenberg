@@ -2,10 +2,10 @@
 
 ![Trachtenberg App Banner](public/og-image.jpg)
 
-[![](https://img.shields.io/badge/React%20Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
-[![](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
-[![](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![](https://img.shields.io/badge/Zustand-454545?style=for-the-badge&logo=zustand&logoColor=white)](https://github.com/pmndrs/zustand)
+[![React Native](https://img.shields.io/badge/React%20Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Zustand](https://img.shields.io/badge/Zustand-454545?style=for-the-badge&logo=zustand&logoColor=white)](https://github.com/pmndrs/zustand)
 
 A cross-platform mobile and web application to teach the [Trachtenberg method](https://en.wikipedia.org/wiki/Trachtenberg_system) of multiplication, a system of rapid mental calculation. The system was created by Jakow Trachtenberg, a Russian Jew, while in a Nazi concentration camp.
 

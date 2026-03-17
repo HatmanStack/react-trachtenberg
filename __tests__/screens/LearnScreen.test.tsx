@@ -46,10 +46,9 @@ describe('[LearnScreen]', () => {
 
   it('should disable Back button on first page', () => {
     const { getByText } = render(<LearnScreenWithTheme />);
-    const backButton = getByText('Back');
-    // Paper Button sets accessibilityState.disabled
-    expect(backButton).toBeTruthy();
-    // On first page, canGoPrevious is false so Back should be disabled
+    expect(useAppStore.getState().tutorialPage).toBe(0);
+    // Press Back on first page — tutorialPage should remain 0
+    fireEvent.press(getByText('Back'));
     expect(useAppStore.getState().tutorialPage).toBe(0);
   });
 

@@ -13,6 +13,12 @@ export function generateAnswerChoices(correctDigit: number): {
   choices: readonly [number, number, number, number];
   correctIndex: number;
 } {
+  if (!Number.isInteger(correctDigit) || correctDigit < 0 || correctDigit > 9) {
+    throw new Error(
+      `correctDigit must be an integer between 0 and 9, got: ${correctDigit}`
+    );
+  }
+
   // Random position for correct answer (0-3)
   const correctIndex = Math.floor(Math.random() * 4);
 

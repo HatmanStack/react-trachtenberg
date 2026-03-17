@@ -53,11 +53,24 @@ describe('SettingsScreen', () => {
   });
 
   afterEach(async () => {
-    // Clean up after each test
+    // Clean up after each test — reset all fields set in beforeEach
     act(() => {
       useAppStore.setState({
         hintsEnabled: false,
         hintHelpShown: false,
+        currentEquation: '',
+        currentAnswer: '',
+        answerProgress: '',
+        indexCount: 0,
+        firstCharRemainder: 0,
+        answerChoices: [],
+        correctAnswerIndex: 0,
+        move: 0,
+        moveCount: 0,
+        remainderHint: 0,
+        hintQuestion: '',
+        hintResult: '',
+        hintHighlightIndices: [],
       });
     });
     await Promise.resolve();

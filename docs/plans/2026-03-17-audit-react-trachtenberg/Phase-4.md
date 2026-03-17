@@ -99,10 +99,10 @@ docs: fix README tutorial count, navigation, clone path, and AsyncStorage claim
    npm run lint:fix
    ```
 3. Add a new "Project Structure" section after the Available Scripts section:
-   ```markdown
-   ## Project Structure
 
-   ```
+   Add a `## Project Structure` heading followed by this directory listing:
+
+   ````text
    app/              # Expo Router file-based routing (screens as routes)
    src/
      screens/        # Screen components (LearnScreen, PracticeScreen, SettingsScreen)
@@ -115,8 +115,7 @@ docs: fix README tutorial count, navigation, clone path, and AsyncStorage claim
      theme/          # Colors, spacing, React Native Paper theme
      types/          # TypeScript interfaces
    __tests__/        # Jest tests mirroring src/ structure
-   ```
-   ```
+   ````
 4. Fix the Node.js version prerequisite: change "Node.js v18.x or higher" (line 45) to "Node.js v24" (matching `.nvmrc` created in Phase 3)
 5. Run verification checks
 
