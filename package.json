@@ -11,7 +11,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint src/ __tests__/ --ext .ts,.tsx",
-    "lint:fix": "eslint src/ __tests__/ --ext .ts,.tsx --fix"
+    "lint:fix": "eslint src/ __tests__/ --ext .ts,.tsx --fix",
+    "prepare": "husky"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -43,10 +44,18 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-native": "^5.0.0",
+    "husky": "^9.1.7",
     "jest": "^30.2.0",
     "jest-expo": "^54.0.13",
+    "lint-staged": "^16.4.0",
     "react-test-renderer": "^19.2.4",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "bash -c 'npx tsc --noEmit'"
+    ]
+  }
 }
