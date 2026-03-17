@@ -18,7 +18,6 @@ const resetStore = () => {
     currentAnswer: '',
     answerProgress: '',
     indexCount: 0,
-    firstCharRemainder: 0,
     answerChoices: [],
     correctAnswerIndex: 0,
     move: 0,
@@ -27,7 +26,6 @@ const resetStore = () => {
     hintQuestion: '',
     hintResult: '',
     hintHighlightIndices: [],
-    _timeoutId: null,
   });
 };
 
@@ -187,18 +185,9 @@ describe('[AppStore]', () => {
       expect(useAppStore.getState().move).toBe(moveCount);
     });
 
-    it('should clear timeout ID to null via cleanup action', () => {
+    it('should not throw when cleanup is called with no active timeout', () => {
       const store = useAppStore.getState();
-
-      // Simulate a timeout being set
-      const fakeTimeout = setTimeout(() => {}, 10000);
-      useAppStore.setState({ _timeoutId: fakeTimeout });
-      expect(useAppStore.getState()._timeoutId).not.toBeNull();
-
-      store.cleanup();
-      expect(useAppStore.getState()._timeoutId).toBeNull();
-
-      clearTimeout(fakeTimeout); // clean up
+      expect(() => store.cleanup()).not.toThrow();
     });
   });
 
@@ -227,29 +216,19 @@ describe('[AppStore]', () => {
         if (result.isComplete) break;
       }
 
-      // After completing, a timeout should be set
-      expect(useAppStore.getState()._timeoutId).not.toBeNull();
-
-      // Advance timers
+      // Advance timers past the delay
       jest.advanceTimersByTime(PROBLEM_COMPLETE_DELAY_MS);
 
       // After timeout, a new problem should be generated
       const stateAfter = useAppStore.getState();
-      expect(stateAfter._timeoutId).toBeNull();
-      // New equation should exist (may or may not be different due to randomness)
       expect(stateAfter.currentEquation).toContain('\u00d7');
     });
 
-    it('should clear previous timeout when a new completion occurs', () => {
+    it('should generate a new problem after completion even when called twice', () => {
       const store = useAppStore.getState();
-
-      // Set a fake timeout
-      const fakeTimeout = setTimeout(() => {}, 99999);
-      useAppStore.setState({ _timeoutId: fakeTimeout });
-
       store.generateNewProblem();
 
-      // Complete all digits
+      // Complete first problem
       const { currentAnswer } = useAppStore.getState();
       for (let i = 0; i < currentAnswer.length; i++) {
         const state = useAppStore.getState();
@@ -257,12 +236,13 @@ describe('[AppStore]', () => {
         if (result.isComplete) break;
       }
 
-      // The old timeout should have been cleared and replaced
-      const newTimeoutId = useAppStore.getState()._timeoutId;
-      expect(newTimeoutId).not.toBeNull();
-      expect(newTimeoutId).not.toBe(fakeTimeout);
+      // Advance past delay to trigger new problem
+      jest.advanceTimersByTime(PROBLEM_COMPLETE_DELAY_MS);
 
-      clearTimeout(fakeTimeout);
+      // A new equation should exist
+      const stateAfter = useAppStore.getState();
+      expect(stateAfter.currentEquation).toContain('\u00d7');
+      expect(stateAfter.answerChoices.length).toBe(4);
     });
   });
 });

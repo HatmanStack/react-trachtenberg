@@ -19,15 +19,13 @@ export interface ValidationResult {
  * @param correctIndex - Index of correct answer (0-3)
  * @param currentAnswer - Full answer string
  * @param indexCount - Current digit position (0 = rightmost)
- * @param currentRemainder - Carry from previous digit
  * @returns Validation result with next state
  */
 export function validateAnswer(
   selectedIndex: number,
   correctIndex: number,
   currentAnswer: string,
-  indexCount: number,
-  currentRemainder: number
+  indexCount: number
 ): ValidationResult {
   const isCorrect = selectedIndex === correctIndex;
 
@@ -40,7 +38,7 @@ export function validateAnswer(
       newAnswerProgress: currentAnswer.substring(
         currentAnswer.length - indexCount
       ),
-      newRemainder: currentRemainder,
+      newRemainder: 0,
     };
   }
 
@@ -53,17 +51,11 @@ export function validateAnswer(
     currentAnswer.length - newIndexCount
   );
 
-  // The carry value for the next digit is computed by the store via
-  // Math.floor(state.remainderHint / 10) in appStore.ts, not here.
-  // The store overwrites this field with the hint system's carry value.
-  // This is an intentional design choice — see ADR-4 in Phase-0.md.
-  const newRemainder = 0;
-
   return {
     isCorrect: true,
     isComplete,
     newIndexCount,
     newAnswerProgress,
-    newRemainder,
+    newRemainder: 0,
   };
 }

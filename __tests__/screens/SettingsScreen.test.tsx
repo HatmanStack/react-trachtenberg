@@ -5,19 +5,6 @@ import { act } from 'react-test-renderer';
 import SettingsScreen from '../../src/screens/SettingsScreen';
 import { useAppStore } from '../../src/store/appStore';
 
-/**
- * Settings Screen Tests
- *
- * Tests for Settings screen UI and functionality:
- * - Component rendering
- * - Hint toggle functionality
- * - State integration
- * - UI elements and accessibility
- *
- * NOTE: These tests currently cannot run due to Expo SDK 54 / Jest compatibility issues.
- * This is documented and will be addressed in Phase 8.
- */
-
 // Wrapper component to provide Paper theme
 const SettingsScreenWithTheme = () => (
   <PaperProvider>
@@ -37,7 +24,6 @@ describe('SettingsScreen', () => {
         currentAnswer: '',
         answerProgress: '',
         indexCount: 0,
-        firstCharRemainder: 0,
         answerChoices: [],
         correctAnswerIndex: 0,
         move: 0,
@@ -62,7 +48,6 @@ describe('SettingsScreen', () => {
         currentAnswer: '',
         answerProgress: '',
         indexCount: 0,
-        firstCharRemainder: 0,
         answerChoices: [],
         correctAnswerIndex: 0,
         move: 0,

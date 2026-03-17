@@ -7,6 +7,10 @@ import { calculateHintStep } from '../utils/hintCalculator';
 import { logger } from '../utils/logger';
 import { PROBLEM_COMPLETE_DELAY_MS } from '../constants/algorithm';
 
+// Module-scoped timeout reference — not reactive state, avoids unnecessary
+// re-renders and serialization issues with NodeJS.Timeout objects.
+let _timeoutId: ReturnType<typeof setTimeout> | null = null;
+
 interface AppState {
   // Settings
   hintsEnabled: boolean;
@@ -20,7 +24,6 @@ interface AppState {
   currentAnswer: string;             // Complete correct answer
   answerProgress: string;            // Partial answer built so far
   indexCount: number;                // Current digit position (0-based from right)
-  firstCharRemainder: number;        // Carry from previous digit calculation
   answerChoices: readonly [number, number, number, number] | readonly [];  // Four button values [0-9]
   correctAnswerIndex: number;        // Which button (0-3) is correct
 
@@ -45,7 +48,6 @@ interface AppState {
   nextHint: () => void;            // Advance to next hint step
 
   // Lifecycle
-  _timeoutId: ReturnType<typeof setTimeout> | null;
   cleanup: () => void;
 }
 
@@ -60,7 +62,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
       currentAnswer: '',
       answerProgress: '',
       indexCount: 0,
-      firstCharRemainder: 0,
       answerChoices: [],
       correctAnswerIndex: 0,
 
@@ -71,9 +72,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
       hintQuestion: '',
       hintResult: '',
       hintHighlightIndices: [],
-
-      // Lifecycle
-      _timeoutId: null,
 
       // Actions
       setHintsEnabled: (enabled) => set({ hintsEnabled: enabled }),
@@ -105,7 +103,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
           currentAnswer: answer,
           answerProgress: '',
           indexCount: 0,
-          firstCharRemainder: 0,
           answerChoices: choices,
           correctAnswerIndex: correctIndex,
           // Hint state initialized for first digit
@@ -127,8 +124,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
           buttonIndex,
           state.correctAnswerIndex,
           state.currentAnswer,
-          state.indexCount,
-          state.firstCharRemainder
+          state.indexCount
         );
 
         logger.debug('submitAnswer - validateAnswer result:', result);
@@ -143,19 +139,16 @@ export const useAppStore = create<AppState>()((set, get) => ({
           set({
             indexCount: result.newIndexCount,
             answerProgress: result.newAnswerProgress,
-            firstCharRemainder: result.newRemainder,
           });
 
           // Clear any existing timeout before setting new one
-          const existingTimeout = get()._timeoutId;
-          if (existingTimeout !== null) {
-            clearTimeout(existingTimeout);
+          if (_timeoutId !== null) {
+            clearTimeout(_timeoutId);
           }
-          const timeoutId = setTimeout(() => {
-            set({ _timeoutId: null });
+          _timeoutId = setTimeout(() => {
+            _timeoutId = null;
             get().generateNewProblem();
           }, PROBLEM_COMPLETE_DELAY_MS);
-          set({ _timeoutId: timeoutId });
           return { isCorrect: true, isComplete: true };
         }
 
@@ -182,7 +175,6 @@ export const useAppStore = create<AppState>()((set, get) => ({
         set({
           indexCount: result.newIndexCount,
           answerProgress: result.newAnswerProgress,
-          firstCharRemainder: result.newRemainder,
           answerChoices: choices,
           correctAnswerIndex: correctIndex,
           // Reset hints for next digit with carry
@@ -242,9 +234,8 @@ export const useAppStore = create<AppState>()((set, get) => ({
 
       // Lifecycle actions
       cleanup: () => {
-        const id = get()._timeoutId;
-        if (id) clearTimeout(id);
-        set({ _timeoutId: null });
+        if (_timeoutId) clearTimeout(_timeoutId);
+        _timeoutId = null;
       },
 
     }));

@@ -31,7 +31,6 @@ const resetStore = () => {
     currentAnswer: '',
     answerProgress: '',
     indexCount: 0,
-    firstCharRemainder: 0,
     answerChoices: [],
     correctAnswerIndex: 0,
     move: 0,
@@ -40,7 +39,6 @@ const resetStore = () => {
     hintQuestion: '',
     hintResult: '',
     hintHighlightIndices: [],
-    _timeoutId: null,
   });
 };
 

@@ -19,7 +19,6 @@ describe('Store State Management', () => {
       currentAnswer: '',
       answerProgress: '',
       indexCount: 0,
-      firstCharRemainder: 0,
       answerChoices: [],
       correctAnswerIndex: 0,
       move: 0,
@@ -109,8 +108,7 @@ describe('Store State Management', () => {
         currentAnswer: '',
         answerProgress: '',
         indexCount: 0,
-        firstCharRemainder: 0,
-        answerChoices: [],
+          answerChoices: [],
         correctAnswerIndex: 0,
         move: 0,
         moveCount: 0,
@@ -130,7 +128,6 @@ describe('Store State Management', () => {
       expect(state.currentAnswer).toBe('');
       expect(state.answerProgress).toBe('');
       expect(state.indexCount).toBe(0);
-      expect(state.firstCharRemainder).toBe(0);
       expect(state.answerChoices).toEqual([]);
       expect(state.correctAnswerIndex).toBe(0);
       expect(state.move).toBe(0);

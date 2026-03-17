@@ -33,8 +33,5 @@ jobs:
       - name: TypeScript type check
         run: npx tsc --noEmit
 
-      # Optional: Add link checking for markdown files
-      # - name: Check links
-      #   uses: lycheeverse/lychee-action@v2
-      #   with:
-      #     args: --no-progress '**/*.md'
+      - name: Lint documentation
+        run: npm run lint:docs

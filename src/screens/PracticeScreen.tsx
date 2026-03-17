@@ -24,7 +24,6 @@ export default function PracticeScreen() {
   const answerChoices = useAppStore((state) => state.answerChoices);
   const generateNewProblem = useAppStore((state) => state.generateNewProblem);
   const submitAnswer = useAppStore((state) => state.submitAnswer);
-  const correctAnswerIndex = useAppStore((state) => state.correctAnswerIndex);
   const indexCount = useAppStore((state) => state.indexCount);
 
   // Hint state
@@ -129,7 +128,6 @@ export default function PracticeScreen() {
 
   const handleAnswerPress = useCallback((buttonIndex: number) => {
     logger.debug('handleAnswerPress called - buttonIndex:', buttonIndex, 'hintsEnabled:', hintsEnabled, 'move:', move, 'moveCount:', moveCount);
-    logger.debug('handleAnswerPress - current choices:', answerChoices, 'correctIndex:', correctAnswerIndex);
 
     // Enforce hint viewing when hints enabled
     // Must view at least MIN_HINTS_BEFORE_ANSWER hints before answering
@@ -163,7 +161,7 @@ export default function PracticeScreen() {
       // Hide hints on wrong answer
       hideHints();
     }
-  }, [hintsEnabled, move, submitAnswer, showFeedback, showHints, hideHints, answerChoices, correctAnswerIndex]);
+  }, [hintsEnabled, move, submitAnswer, showFeedback, showHints, hideHints]);
 
   // Stable callbacks for AnswerButton to preserve React.memo
   const handlePress0 = useCallback(() => handleAnswerPress(0), [handleAnswerPress]);

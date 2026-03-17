@@ -28,7 +28,6 @@ describe('Hint System Integration', () => {
       currentAnswer: '',
       answerProgress: '',
       indexCount: 0,
-      firstCharRemainder: 0,
       answerChoices: [],
       correctAnswerIndex: 0,
       move: 0,
