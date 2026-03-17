@@ -7,9 +7,6 @@ import { calculateHintStep } from '../utils/hintCalculator';
 import { logger } from '../utils/logger';
 import { PROBLEM_COMPLETE_DELAY_MS } from '../constants/algorithm';
 
-// Module-scoped timeout ID for problem completion delay
-let problemCompleteTimeoutId: ReturnType<typeof setTimeout> | null = null;
-
 interface AppState {
   // Settings
   hintsEnabled: boolean;
@@ -46,6 +43,10 @@ interface AppState {
 
   // Hint actions
   nextHint: () => void;            // Advance to next hint step
+
+  // Lifecycle
+  _timeoutId: ReturnType<typeof setTimeout> | null;
+  cleanup: () => void;
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
@@ -70,6 +71,9 @@ export const useAppStore = create<AppState>()((set, get) => ({
       hintQuestion: '',
       hintResult: '',
       hintHighlightIndices: [],
+
+      // Lifecycle
+      _timeoutId: null,
 
       // Actions
       setHintsEnabled: (enabled) => set({ hintsEnabled: enabled }),
@@ -143,13 +147,15 @@ export const useAppStore = create<AppState>()((set, get) => ({
           });
 
           // Clear any existing timeout before setting new one
-          if (problemCompleteTimeoutId !== null) {
-            clearTimeout(problemCompleteTimeoutId);
+          const existingTimeout = get()._timeoutId;
+          if (existingTimeout !== null) {
+            clearTimeout(existingTimeout);
           }
-          problemCompleteTimeoutId = setTimeout(() => {
-            problemCompleteTimeoutId = null;
+          const timeoutId = setTimeout(() => {
+            set({ _timeoutId: null });
             get().generateNewProblem();
           }, PROBLEM_COMPLETE_DELAY_MS);
+          set({ _timeoutId: timeoutId });
           return { isCorrect: true, isComplete: true };
         }
 
@@ -232,6 +238,13 @@ export const useAppStore = create<AppState>()((set, get) => ({
         // Log the updated state to verify
         const newState = get();
         logger.debug('nextHint: verified new state - question:', newState.hintQuestion, 'result:', newState.hintResult);
+      },
+
+      // Lifecycle actions
+      cleanup: () => {
+        const id = get()._timeoutId;
+        if (id) clearTimeout(id);
+        set({ _timeoutId: null });
       },
 
     }));

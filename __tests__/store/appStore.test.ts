@@ -26,6 +26,7 @@ const resetStore = () => {
     hintQuestion: '',
     hintResult: '',
     hintHighlightIndices: [],
+    _timeoutId: null,
   });
 };
 
