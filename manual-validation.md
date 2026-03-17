@@ -1,3 +1,15 @@
+> **SUPERSEDED** — This validation report was written on 2025-11-09 against an earlier
+> version of the codebase. The following values have changed since this report:
+> - `COMPLETE_DIGIT_MOVES` array values updated (now `[0, 3, 8, 14, 20, 26, 32]`)
+> - `UNITS_DIGIT_MOVES` array removed, replaced by `localMove % 2 === 0` logic
+> - `getMoveRange()` return values changed due to updated `MOVES_COUNT` array
+> - `getDigitIndices()` now covers moves 0-32 (was 0-23)
+> - `shouldShowHint()` function has been removed
+> - Move range is now 0-32 (was 0-23)
+>
+> Do not use this document as a reference for current behavior.
+> See `src/utils/hintCalculator.ts` and `src/utils/hintMoveTracker.ts` for current logic.
+
 # Manual Validation Report for Phase 4 Hint System
 
 ## Executive Summary
