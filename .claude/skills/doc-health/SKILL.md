@@ -75,7 +75,7 @@ Create the directory.
 
 **You** (the orchestrator) must read the role prompt file and embed its contents in the agent's prompt. Agents cannot access skill directory files.
 
-1. **Read** `.claude/skills/pipeline/doc-auditor.md` — store contents as `AUDITOR_PROMPT`
+1. **Read** `skills/pipeline/doc-auditor.md` — store contents as `AUDITOR_PROMPT`
 2. Spawn an **Agent** with:
 
 ```xml
@@ -90,16 +90,17 @@ Constraints: [from Step 1]
 </task>
 ```
 
-### Step 4: Write Audit Document
+### Step 4: Validate and Write Audit Document
 
-Read the auditor output. **Write** `docs/plans/YYYY-MM-DD-docs-slug/doc-audit.md`:
+Verify the auditor's output contains `DOC_AUDIT_COMPLETE`. If missing, the agent may have been truncated — report to the user and do NOT write doc-audit.md with partial data.
+
+If signal present, **Write** `docs/plans/YYYY-MM-DD-docs-slug/doc-audit.md`:
 
 ```markdown
 ---
 type: doc-health
 date: YYYY-MM-DD
 prevention_scope: [from Step 1 — what tooling to add]
-ci_platform: [from Step 1]
 language_stack: [from Step 1]
 ---
 
@@ -121,7 +122,22 @@ language_stack: [from Step 1]
 DRIFT, GAPS, STALE, BROKEN LINKS, STALE CODE EXAMPLES, CONFIG DRIFT, STRUCTURE ISSUES]
 ```
 
-### Step 5: Handoff
+### Step 5: Log to Manifest
+
+Append an entry to `.claude/skill-runs.json` in the repo root. If the file does not exist, create it with an empty array first.
+
+```json
+{
+  "skill": "doc-health",
+  "date": "YYYY-MM-DD",
+  "plan": "YYYY-MM-DD-docs-slug"
+}
+```
+
+- Read the existing file, parse the JSON array, append the new entry, and write it back
+- If the file is malformed, overwrite it with a fresh array containing only the new entry
+
+### Step 6: Handoff
 
 ```text
 Audit complete: docs/plans/YYYY-MM-DD-docs-slug/doc-audit.md
