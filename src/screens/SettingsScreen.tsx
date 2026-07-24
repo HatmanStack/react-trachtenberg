@@ -1,4 +1,3 @@
-import React from 'react';
 import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { List, Switch, Divider } from 'react-native-paper';
 import { useAppStore } from '../store/appStore';

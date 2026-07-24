@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { StyleSheet, View, ScrollView, Alert, Animated, useWindowDimensions } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 import { useAppStore } from '../store/appStore';

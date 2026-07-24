@@ -1,4 +1,3 @@
-import React from 'react';
 import { render } from '@testing-library/react-native';
 import { HighlightedText } from '../../src/components/HighlightedText';
 
