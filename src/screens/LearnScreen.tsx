@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { StyleSheet, View, ScrollView, useWindowDimensions } from 'react-native';
 import { Surface, Text, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
