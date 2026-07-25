@@ -12,16 +12,16 @@ global.structuredClone = (val) => JSON.parse(JSON.stringify(val));
 // "trying to `import` a file outside of the scope of the test code". Reading
 // them here swaps each getter for a plain value while the registry is alive.
 for (const name of [
-  "fetch",
-  "Headers",
-  "Request",
-  "Response",
-  "TextDecoder",
-  "TextDecoderStream",
-  "TextEncoderStream",
-  "URL",
-  "URLSearchParams",
-  "DOMException",
+  'fetch',
+  'Headers',
+  'Request',
+  'Response',
+  'TextDecoder',
+  'TextDecoderStream',
+  'TextEncoderStream',
+  'URL',
+  'URLSearchParams',
+  'DOMException',
 ]) {
   try {
     void global[name];
@@ -31,8 +31,8 @@ for (const name of [
 }
 
 // Mock react-native-gesture-handler
-jest.mock("react-native-gesture-handler", () => {
-  const View = require("react-native").View;
+jest.mock('react-native-gesture-handler', () => {
+  const View = require('react-native').View;
   return {
     GestureHandlerRootView: View,
     Swipeable: View,
